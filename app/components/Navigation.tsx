@@ -7,6 +7,7 @@ import {
     CheckCircle,
     Radio,
     MessageSquare,
+    UserCheck,
     Sun,
     Moon
 } from 'lucide-react';
@@ -22,6 +23,7 @@ export default function Navigation({ isDark, toggleTheme }: NavigationProps) {
     const navItems = [
         { href: '/orders', label: 'Orders', icon: Package },
         { href: '/daily-status', label: 'Daily Status', icon: CheckCircle },
+        { href: '/follow-ups', label: 'Follow-Ups', icon: UserCheck },
         { href: '/templates', label: 'Templates', icon: MessageSquare },
     ];
 
