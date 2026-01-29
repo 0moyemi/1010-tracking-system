@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+/* Root variables for theming */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #081F44;
+  --primary-light: #0a2857;
 }
 
 @theme inline {
@@ -19,8 +22,86 @@
   }
 }
 
+/* Base body styles */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile-first optimizations */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Large touch targets for accessibility (60+ users) */
+button,
+a,
+input,
+select,
+textarea {
+  min-height: 44px;
+  /* iOS recommended minimum */
+  touch-action: manipulation;
+  /* Disable double-tap zoom */
+}
+
+/* Disable text selection on buttons for better mobile UX */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Improve input styling on mobile */
+input,
+select,
+textarea {
+  font-size: 16px;
+  /* Prevents iOS zoom on focus */
+}
+
+/* Remove default number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* PWA-specific styles */
+@media (display-mode: standalone) {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* Loading states */
+.loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Offline indicator (can be added later) */
+.offline-indicator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f59e0b;
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  z-index: 9999;
 }
