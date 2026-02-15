@@ -6,9 +6,10 @@ import { Plus, TrendingUp, DollarSign, Package as PackageIcon, CheckCircle as Ch
 // Order type definition
 export interface Order {
     id: string;
-    date: string; // Format: ddmmyy
+    date: string; // ISO format: YYYY-MM-DD for sorting
+    dateDisplay: string; // Human-readable format
     item: string;
-    status: 'New' | 'Confirmed' | 'Delivered' | 'Cancelled';
+    status: 'Confirmed' | 'Cancelled';
     price: number;
 }
 
@@ -37,23 +38,33 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
         }
     }, [orders]);
 
-    // Format date as ddmmyy
+    // Format date as ISO string for storage and sorting
     const formatDate = (date: Date): string => {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = String(date.getFullYear()).slice(-2);
-        return `${day}${month}${year}`;
+        return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    };
+
+    // Format date for display (e.g., "Feb 1, 2026")
+    const formatDateDisplay = (isoDate: string): string => {
+        const date = new Date(isoDate);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     };
 
     // Quick add order function
     const handleQuickAdd = () => {
         if (!newItem.trim() || !newPrice.trim()) return;
 
+        const now = new Date();
+        const isoDate = formatDate(now);
         const order: Order = {
             id: Date.now().toString(),
-            date: formatDate(new Date()),
+            date: isoDate,
+            dateDisplay: formatDateDisplay(isoDate),
             item: newItem.trim(),
-            status: 'New',
+            status: 'Confirmed',
             price: parseFloat(newPrice)
         };
 
@@ -80,7 +91,7 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
         return orders
             .filter(o => {
                 const orderDate = o.date;
-                return orderDate >= weekAgoStr && orderDate <= todayStr && o.status === 'Delivered';
+                return orderDate >= weekAgoStr && orderDate <= todayStr && o.status === 'Confirmed';
             })
             .reduce((sum, o) => sum + o.price, 0);
     };
@@ -94,12 +105,12 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
         return orders
             .filter(o => {
                 const orderDate = o.date;
-                return orderDate >= monthAgoStr && orderDate <= todayStr && o.status === 'Delivered';
+                return orderDate >= monthAgoStr && orderDate <= todayStr && o.status === 'Confirmed';
             })
             .reduce((sum, o) => sum + o.price, 0);
     };
 
-    // Calculate progress (completed orders this week)
+    // Calculate progress (confirmed orders this week)
     const calculateWeeklyProgress = () => {
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -111,7 +122,7 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
             return orderDate >= weekAgoStr && orderDate <= todayStr;
         });
 
-        const completed = weekOrders.filter(o => o.status === 'Delivered').length;
+        const completed = weekOrders.filter(o => o.status === 'Confirmed').length;
         return { completed, total: weekOrders.length };
     };
 
@@ -220,14 +231,6 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
                         />
                     </div>
 
-                    {/* Date Auto-fills - Display Only */}
-                    <div className={`p-4 rounded-xl mb-4 ${isDark ? 'bg-gray-700' : 'bg-blue-50'} border ${isDark ? 'border-gray-600' : 'border-blue-200'}`}>
-                        <p className={`text-sm flex items-center gap-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <Clock size={16} />
-                            Date (auto): {formatDate(new Date())}
-                        </p>
-                    </div>
-
                     {/* Action Buttons */}
                     <div className="grid grid-cols-2 gap-3">
                         <button
@@ -266,72 +269,46 @@ export default function OrdersSection({ isDark }: OrdersSectionProps) {
                     orders.map(order => (
                         <div
                             key={order.id}
-                            className={`p-5 rounded-xl border-2 shadow-sm hover:shadow-md transition-all ${order.status === 'Delivered'
+                            className={`p-5 rounded-xl border-2 shadow-sm hover:shadow-md transition-all ${order.status === 'Confirmed'
                                 ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-400'
-                                : order.status === 'Cancelled'
-                                    ? 'bg-gradient-to-r from-red-50 to-red-100 border-red-400'
-                                    : order.status === 'Confirmed'
-                                        ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-400'
-                                        : isDark
-                                            ? 'bg-gray-800 border-gray-700'
-                                            : 'bg-white border-gray-300'
+                                : 'bg-gradient-to-r from-red-50 to-red-100 border-red-400'
                                 }`}
                         >
                             {/* Date and Price Row */}
                             <div className="flex justify-between items-start mb-3">
-                                <span className={`text-sm font-semibold ${order.status === 'Delivered'
+                                <span className={`text-sm font-semibold ${order.status === 'Confirmed'
                                     ? 'text-green-700'
-                                    : order.status === 'Cancelled'
-                                        ? 'text-red-700'
-                                        : isDark
-                                            ? 'text-gray-300'
-                                            : 'text-gray-600'
+                                    : 'text-red-700'
                                     }`}>
-                                    {order.date}
+                                    {order.dateDisplay || formatDateDisplay(order.date)}
                                 </span>
-                                <span className={`text-xl font-bold ${order.status === 'Delivered'
+                                <span className={`text-xl font-bold ${order.status === 'Confirmed'
                                     ? 'text-green-700'
-                                    : order.status === 'Cancelled'
-                                        ? 'text-red-700'
-                                        : isDark
-                                            ? 'text-white'
-                                            : 'text-[#081F44]'
+                                    : 'text-red-700'
                                     }`}>
                                     ₦{order.price.toLocaleString()}
                                 </span>
                             </div>
 
                             {/* Item Name */}
-                            <p className={`text-lg font-semibold mb-3 ${order.status === 'Delivered'
+                            <p className={`text-lg font-semibold mb-3 ${order.status === 'Confirmed'
                                 ? 'text-green-800'
-                                : order.status === 'Cancelled'
-                                    ? 'text-red-800'
-                                    : isDark
-                                        ? 'text-white'
-                                        : 'text-gray-900'
+                                : 'text-red-800'
                                 }`}>
                                 {order.item}
                             </p>
 
-                            {/* Status Dropdown - Large for 60+ users */}
+                            {/* Status Toggle - Large for 60+ users */}
                             <select
                                 value={order.status}
                                 onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])}
-                                className={`w-full p-4 text-lg font-bold rounded-xl border-2 cursor-pointer transition-all ${order.status === 'Delivered'
+                                className={`w-full p-4 text-lg font-bold rounded-xl border-2 cursor-pointer transition-all ${order.status === 'Confirmed'
                                     ? 'bg-green-50 border-green-500 text-green-800 hover:bg-green-100'
-                                    : order.status === 'Cancelled'
-                                        ? 'bg-red-50 border-red-500 text-red-800 hover:bg-red-100'
-                                        : order.status === 'Confirmed'
-                                            ? 'bg-blue-50 border-blue-500 text-blue-800 hover:bg-blue-100'
-                                            : isDark
-                                                ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                                                : 'bg-amber-50 border-amber-500 text-amber-800 hover:bg-amber-100'
+                                    : 'bg-red-50 border-red-500 text-red-800 hover:bg-red-100'
                                     }`}
                             >
-                                <option value="New">⏱️ New</option>
-                                <option value="Confirmed">✓ Confirmed</option>
-                                <option value="Delivered">✓✓ Delivered</option>
-                                <option value="Cancelled">✗ Cancelled</option>
+                                <option value="Confirmed">✅ Confirmed</option>
+                                <option value="Cancelled">❌ Cancelled</option>
                             </select>
                         </div>
                     ))

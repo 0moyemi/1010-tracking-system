@@ -21,21 +21,45 @@ export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
     // Function to check if broadcast is allowed
     const checkBroadcastAvailability = () => {
         const savedDailyStatus = localStorage.getItem('dailyStatus');
-
-        if (savedDailyStatus) {
-            const dailyStatus = JSON.parse(savedDailyStatus);
-            const today = new Date().toISOString().split('T')[0];
-
-            // Find today's status and check if broadcast is allowed
-            const todayStatus = dailyStatus.find((d: any) => d.date === today);
-            if (todayStatus && todayStatus.broadcastAllowed) {
-                setCanBroadcast(true);
-            } else {
-                setCanBroadcast(false);
-            }
-        } else {
+        if (!savedDailyStatus) {
             setCanBroadcast(false);
+            return;
         }
+
+        const dailyStatus = JSON.parse(savedDailyStatus);
+        const today = new Date().toISOString().split('T')[0];
+        const todayIndex = dailyStatus.findIndex((d: any) => d.date === today);
+
+        if (todayIndex < 5) {
+            setCanBroadcast(false);
+            return;
+        }
+
+        const isBroadcastDay = (todayIndex + 1) % 6 === 0;
+        if (!isBroadcastDay) {
+            setCanBroadcast(false);
+            return;
+        }
+
+        const last6Days = dailyStatus.slice(Math.max(0, todayIndex - 5), todayIndex + 1);
+        const allTicked = last6Days.every((d: any) => d.checked);
+        if (!allTicked) {
+            setCanBroadcast(false);
+            return;
+        }
+
+        const alreadyBroadcasted = broadcasts.some(b => b.date === today && b.checked);
+        if (alreadyBroadcasted) {
+            setCanBroadcast(false);
+            return;
+        }
+
+        const recentBroadcast = broadcasts.find(b => {
+            const broadcastIndex = dailyStatus.findIndex((d: any) => d.date === b.date);
+            return broadcastIndex !== -1 && broadcastIndex > todayIndex - 6 && broadcastIndex < todayIndex;
+        });
+
+        setCanBroadcast(!recentBroadcast);
     };
 
     // Load broadcasts and check if user can broadcast
@@ -46,7 +70,9 @@ export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
             const loaded = JSON.parse(savedBroadcasts);
             setBroadcasts(loaded);
         }
+    }, []);
 
+    useEffect(() => {
         // Initial check
         checkBroadcastAvailability();
 
@@ -68,7 +94,8 @@ export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
             clearInterval(interval);
             window.removeEventListener('storage', handleStorageChange);
         };
-    }, []);
+    }, [broadcasts]);
+
 
     // Auto-save broadcasts
     useEffect(() => {
@@ -131,8 +158,8 @@ export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
                         <div>
                             <p className="text-white text-base leading-relaxed">
                                 <strong className="text-lg">Broadcast Rules:</strong><br />
-                                • You can only broadcast once every 5 days<br />
-                                • Complete your daily status for 5 consecutive days to unlock broadcast
+                                • You can only broadcast once every 6 days<br />
+                                • Complete your daily status for 6 consecutive days to unlock broadcast
                             </p>
                         </div>
                     </div>
@@ -153,7 +180,7 @@ export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
                             <Clock size={24} className={isDark ? 'text-gray-400' : 'text-amber-600'} />
                             <p className={`text-center text-lg ${isDark ? 'text-gray-400' : 'text-amber-700'}`}>
                                 <strong>Broadcast not available yet.</strong><br />
-                                <span className="text-base">Complete 5 days of daily status to unlock.</span>
+                                <span className="text-base">Complete 6 days of daily status to unlock.</span>
                             </p>
                         </div>
                     </div>

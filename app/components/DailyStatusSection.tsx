@@ -71,19 +71,19 @@ export default function DailyStatusSection({ isDark }: DailyStatusSectionProps) 
     };
 
     const canBroadcastOnDay = (dayIndex: number): boolean => {
-        if (dayIndex < 4) return false;
+        if (dayIndex < 5) return false;
         if (dayIndex > 0 && !monthStatus[dayIndex - 1]?.checked) {
             return false;
         }
-        const last5Days = monthStatus.slice(Math.max(0, dayIndex - 4), dayIndex + 1);
-        const allTicked = last5Days.every(d => d.checked);
+        const last6Days = monthStatus.slice(Math.max(0, dayIndex - 5), dayIndex + 1);
+        const allTicked = last6Days.every(d => d.checked);
         if (!allTicked) return false;
         const dayDate = monthStatus[dayIndex].date;
         const alreadyBroadcasted = broadcasts.some(b => b.date === dayDate);
         if (alreadyBroadcasted) return false;
         const recentBroadcast = broadcasts.find(b => {
             const broadcastIndex = monthStatus.findIndex(d => d.date === b.date);
-            return broadcastIndex !== -1 && broadcastIndex > dayIndex - 5 && broadcastIndex < dayIndex;
+            return broadcastIndex !== -1 && broadcastIndex > dayIndex - 6 && broadcastIndex < dayIndex;
         });
         return !recentBroadcast;
     };
@@ -178,7 +178,7 @@ export default function DailyStatusSection({ isDark }: DailyStatusSectionProps) 
                 </div>
                 <div className={`p-4 rounded-xl mb-4 border-2 ${isDark ? 'bg-blue-900/50 border-blue-700' : 'bg-blue-50 border-blue-300'}`}>
                     <p className={`text-lg ${isDark ? 'text-blue-200' : 'text-blue-900'} text-center`}>
-                        ✅ <strong>Tick daily posts below</strong> • 📢 <strong>Broadcasts appear every 5 days</strong>
+                        ✅ <strong>Tick daily posts below</strong> • 📢 <strong>Broadcasts appear every 6 days</strong>
                     </p>
                 </div>
             </div>
@@ -187,7 +187,7 @@ export default function DailyStatusSection({ isDark }: DailyStatusSectionProps) 
                     const today = new Date().toISOString().split('T')[0];
                     const isToday = day.date === today;
                     const isFuture = day.date > today;
-                    const isBroadcastDay = (index + 1) % 5 === 0 && index >= 4;
+                    const isBroadcastDay = (index + 1) % 6 === 0 && index >= 5;
                     const canBroadcast = isBroadcastDay && canBroadcastOnDay(index);
                     const broadcastDone = broadcasts.some(b => b.date === day.date);
                     return (

@@ -2,14 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, UserCheck, Trash2, Edit2, X, Check } from 'lucide-react';
+import { defaultTemplates } from './ShortcutTemplatesSection';
 
 // Follow-up type definition
 export interface FollowUp {
     id: string;
     customerName: string;
+    waNumber: string;
     items: string;
     dateAdded: string;
     notes?: string;
+}
+
+interface MessageTemplate {
+    id: string;
+    title: string;
+    message: string;
 }
 
 interface FollowUpsSectionProps {
@@ -19,13 +27,18 @@ interface FollowUpsSectionProps {
 export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
     const [followUps, setFollowUps] = useState<FollowUp[]>([]);
     const [newCustomerName, setNewCustomerName] = useState('');
+    const [newWaNumber, setNewWaNumber] = useState('');
     const [newItems, setNewItems] = useState('');
     const [newNotes, setNewNotes] = useState('');
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editCustomerName, setEditCustomerName] = useState('');
+    const [editWaNumber, setEditWaNumber] = useState('');
     const [editItems, setEditItems] = useState('');
     const [editNotes, setEditNotes] = useState('');
+    const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+    const [activeFollowUpId, setActiveFollowUpId] = useState<string | null>(null);
+    const [selectedTemplateById, setSelectedTemplateById] = useState<Record<string, string>>({});
 
     // Load follow-ups from localStorage on mount
     useEffect(() => {
@@ -44,6 +57,25 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
         }
     }, [followUps]);
 
+    useEffect(() => {
+        const savedTemplates = localStorage.getItem('messageTemplates');
+        if (savedTemplates) {
+            setTemplates(JSON.parse(savedTemplates));
+        } else {
+            setTemplates(defaultTemplates);
+        }
+    }, []);
+
+    const sanitizeWaNumber = (value: string) => value.replace(/\D/g, '').slice(0, 11);
+
+    const isValidWaNumber = (value: string) => /^\d{11}$/.test(value);
+
+    const normalizeWaNumber = (value: string) => {
+        const digits = sanitizeWaNumber(value);
+        if (!isValidWaNumber(digits)) return null;
+        return `234${digits.slice(1)}`;
+    };
+
     // Format date for display
     const formatDisplayDate = (dateStr: string): string => {
         const date = new Date(dateStr);
@@ -55,11 +87,15 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
 
     // Add new follow-up
     const handleAdd = () => {
-        if (!newCustomerName.trim() || !newItems.trim()) return;
+        if (!newCustomerName.trim() || !newItems.trim() || !isValidWaNumber(newWaNumber)) {
+            alert('Please fill all required fields with a valid WhatsApp number.');
+            return;
+        }
 
         const followUp: FollowUp = {
             id: Date.now().toString(),
             customerName: newCustomerName.trim(),
+            waNumber: newWaNumber.trim(),
             items: newItems.trim(),
             dateAdded: new Date().toISOString(),
             notes: newNotes.trim() || undefined
@@ -67,6 +103,7 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
 
         setFollowUps([followUp, ...followUps]);
         setNewCustomerName('');
+        setNewWaNumber('');
         setNewItems('');
         setNewNotes('');
         setIsAdding(false);
@@ -76,19 +113,24 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
     const startEdit = (followUp: FollowUp) => {
         setEditingId(followUp.id);
         setEditCustomerName(followUp.customerName);
+        setEditWaNumber(followUp.waNumber || '');
         setEditItems(followUp.items);
         setEditNotes(followUp.notes || '');
     };
 
     // Save edit
     const saveEdit = (id: string) => {
-        if (!editCustomerName.trim() || !editItems.trim()) return;
+        if (!editCustomerName.trim() || !editItems.trim() || !isValidWaNumber(editWaNumber)) {
+            alert('Please fill all required fields with a valid WhatsApp number.');
+            return;
+        }
 
         setFollowUps(followUps.map(fu =>
             fu.id === id
                 ? {
                     ...fu,
                     customerName: editCustomerName.trim(),
+                    waNumber: editWaNumber.trim(),
                     items: editItems.trim(),
                     notes: editNotes.trim() || undefined
                 }
@@ -101,6 +143,7 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
     const cancelEdit = () => {
         setEditingId(null);
         setEditCustomerName('');
+        setEditWaNumber('');
         setEditItems('');
         setEditNotes('');
     };
@@ -110,6 +153,30 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
         if (confirm('Are you sure you want to remove this follow-up?')) {
             setFollowUps(followUps.filter(fu => fu.id !== id));
         }
+    };
+
+    const toggleTemplatePanel = (followUpId: string) => {
+        setActiveFollowUpId(prev => (prev === followUpId ? null : followUpId));
+        setSelectedTemplateById(prev => {
+            if (prev[followUpId] || templates.length === 0) return prev;
+            return { ...prev, [followUpId]: templates[0].id };
+        });
+    };
+
+    const handleSendNow = (followUp: FollowUp) => {
+        const templateId = selectedTemplateById[followUp.id];
+        const template = templates.find(t => t.id === templateId);
+        if (!template) {
+            alert('Please select a message template.');
+            return;
+        }
+        const normalized = normalizeWaNumber(followUp.waNumber);
+        if (!normalized) {
+            alert('Please enter a valid WhatsApp number (11 digits).');
+            return;
+        }
+        const encodedMessage = encodeURIComponent(template.message);
+        window.open(`https://wa.me/${normalized}?text=${encodedMessage}`, '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -185,6 +252,22 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
                             </div>
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    WhatsApp Number (11 digits) *
+                                </label>
+                                <input
+                                    type="tel"
+                                    inputMode="numeric"
+                                    value={newWaNumber}
+                                    onChange={(e) => setNewWaNumber(sanitizeWaNumber(e.target.value))}
+                                    placeholder="09040991849"
+                                    className={`w-full px-4 py-3 rounded-xl border ${isDark
+                                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                                        } focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all`}
+                                />
+                            </div>
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                                     Items of Interest *
                                 </label>
                                 <input
@@ -227,6 +310,7 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
                                     onClick={() => {
                                         setIsAdding(false);
                                         setNewCustomerName('');
+                                        setNewWaNumber('');
                                         setNewItems('');
                                         setNewNotes('');
                                     }}
@@ -271,6 +355,22 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
                                                 type="text"
                                                 value={editCustomerName}
                                                 onChange={(e) => setEditCustomerName(e.target.value)}
+                                                className={`w-full px-4 py-2 rounded-xl border ${isDark
+                                                    ? 'bg-gray-800 border-gray-700 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                                    } focus:ring-2 focus:ring-purple-500 outline-none`}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                WhatsApp Number
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                inputMode="numeric"
+                                                value={editWaNumber}
+                                                onChange={(e) => setEditWaNumber(sanitizeWaNumber(e.target.value))}
+                                                placeholder="09040991849"
                                                 className={`w-full px-4 py-2 rounded-xl border ${isDark
                                                     ? 'bg-gray-800 border-gray-700 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
@@ -333,11 +433,18 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
                                     <div>
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex-1">
-                                                <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-[#081F44]'} mb-1`}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleTemplatePanel(followUp.id)}
+                                                    className={`text-left text-lg font-bold ${isDark ? 'text-white' : 'text-[#081F44]'} mb-1 hover:underline`}
+                                                >
                                                     {followUp.customerName}
-                                                </h3>
+                                                </button>
                                                 <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                                     Added: {formatDisplayDate(followUp.dateAdded)}
+                                                </p>
+                                                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    WA: {followUp.waNumber || 'Not set'}
                                                 </p>
                                             </div>
                                             <div className="flex gap-2">
@@ -361,6 +468,46 @@ export default function FollowUpsSection({ isDark }: FollowUpsSectionProps) {
                                                 </button>
                                             </div>
                                         </div>
+                                        {activeFollowUpId === followUp.id && (
+                                            <div className={`${isDark ? 'bg-gray-800/70' : 'bg-gray-50'} rounded-xl p-4 mb-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+                                                    <div>
+                                                        <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                            Choose template
+                                                        </label>
+                                                        <select
+                                                            value={selectedTemplateById[followUp.id] || ''}
+                                                            onChange={(e) => setSelectedTemplateById(prev => ({ ...prev, [followUp.id]: e.target.value }))}
+                                                            className={`w-full px-4 py-2 rounded-xl border ${isDark
+                                                                ? 'bg-gray-900 border-gray-700 text-white'
+                                                                : 'bg-white border-gray-300 text-gray-900'
+                                                                } focus:ring-2 focus:ring-purple-500 outline-none`}
+                                                        >
+                                                            <option value="" disabled>
+                                                                {templates.length === 0 ? 'No templates available' : 'Select a template'}
+                                                            </option>
+                                                            {templates.map(template => (
+                                                                <option key={template.id} value={template.id}>
+                                                                    {template.title}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                    <div className="flex items-end">
+                                                        <button
+                                                            onClick={() => handleSendNow(followUp)}
+                                                            disabled={!followUp.waNumber || templates.length === 0}
+                                                            className={`w-full md:w-auto px-5 py-2 rounded-xl font-bold transition-all ${followUp.waNumber && templates.length > 0
+                                                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                                : isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'
+                                                                }`}
+                                                        >
+                                                            Send now
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                         <div className={`${isDark ? 'bg-gray-800/50' : 'bg-gray-50'} rounded-xl p-4 mb-3`}>
                                             <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
                                                 Items of Interest

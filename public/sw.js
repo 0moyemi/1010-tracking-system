@@ -79,11 +79,43 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
+// Focus or open the app when a notification is clicked
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    event.waitUntil(
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            for (const client of clientList) {
+                if (client.url === self.location.origin + '/' && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (self.clients.openWindow) {
+                return self.clients.openWindow('/');
+            }
+        })
+    );
+});
+
 // Background sync for future enhancements
 self.addEventListener('sync', (event) => {
     if (event.tag === 'sync-orders') {
         event.waitUntil(syncOrders());
     }
+});
+
+// Push notifications
+self.addEventListener('push', (event) => {
+    const data = event.data ? event.data.json() : {};
+    const title = data.title || 'Notification';
+    const options = {
+        body: data.body || '',
+        tag: data.tag || 'general',
+        icon: '/icon-192.svg',
+        badge: '/icon-192.svg'
+    };
+
+    event.waitUntil(self.registration.showNotification(title, options));
 });
 
 // Placeholder for syncing orders when back online
