@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import NotificationManager from "./components/NotificationManager";
+import { PushNotificationSetup } from "./components/PushNotificationSetup";
+import { getVapidPublicKey } from "./lib/getVapidPublicKey";
+import { NotificationPermissionPrompt } from "./components/NotificationPermissionPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,6 +61,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PushNotificationSetup vapidPublicKey={getVapidPublicKey()} />
+        <NotificationPermissionPrompt />
         {children}
         <NotificationManager />
 

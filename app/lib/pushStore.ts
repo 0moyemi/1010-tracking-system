@@ -1,3 +1,21 @@
+// Get all device records as an array
+export const getAllDevices = async () => {
+    const store = await ensureStore();
+    return Object.values(store.devices);
+};
+
+// Dummy: Get all scheduled notifications for now (replace with real logic)
+export const getAllScheduledNotifications = async () => {
+    // Example: return an array of notifications to send now
+    // Replace this with your real scheduling logic
+    return [
+        {
+            title: 'Daily Reminder',
+            body: 'Check your daily schedule and follow-ups!',
+            url: '/',
+        },
+    ];
+};
 import { promises as fs } from 'fs';
 import path from 'path';
 

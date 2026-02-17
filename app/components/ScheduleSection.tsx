@@ -66,7 +66,7 @@ export default function ScheduleSection() {
 	function getNextSlot() {
 		const now = new Date();
 		now.setMinutes(now.getMinutes() + 15 - (now.getMinutes() % 15));
-		return now.toTimeString().slice(0,5);
+		return now.toTimeString().slice(0, 5);
 	}
 
 	const [time, setTime] = useState(() => getNextSlot());
@@ -323,7 +323,7 @@ export default function ScheduleSection() {
 									<label className="text-sm text-gray-300 mb-1 flex items-center gap-2">
 										<span>Time to post</span>
 										<span title="Pick a time" className="inline-flex items-center justify-center">
-											<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-blue-400"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+											<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-blue-400"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
 										</span>
 									</label>
 									<input
@@ -386,8 +386,17 @@ export default function ScheduleSection() {
 							))}
 						</div>
 					) : (
-						<div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-500">
-							No posts scheduled for this day.
+						<div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-500 flex flex-col items-center">
+							<div className="mb-4">
+								<span className="text-4xl">📅</span>
+							</div>
+							<div className="mb-4">No posts scheduled for this day.</div>
+							<button
+								onClick={() => setShowAdd(true)}
+								className="py-3 px-6 rounded-xl font-bold transition-all bg-blue-600 hover:bg-blue-700 text-white text-lg mt-2"
+							>
+								+ Add Scheduled Post
+							</button>
 						</div>
 					)}
 				</div>

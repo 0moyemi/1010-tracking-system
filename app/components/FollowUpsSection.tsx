@@ -106,12 +106,12 @@ export default function FollowUpsSection() {
 		setFollowUps(followUps.map(fu =>
 			fu.id === id
 				? {
-						...fu,
-						customerName: editCustomerName.trim(),
-						waNumber: editWaNumber.trim(),
-						items: editItems.trim(),
-						notes: editNotes.trim() || undefined,
-					}
+					...fu,
+					customerName: editCustomerName.trim(),
+					waNumber: editWaNumber.trim(),
+					items: editItems.trim(),
+					notes: editNotes.trim() || undefined,
+				}
 				: fu
 		));
 		setEditingId(null);
@@ -212,10 +212,16 @@ export default function FollowUpsSection() {
 					{/* Follow-Ups List */}
 					<div className="space-y-4">
 						{followUps.length === 0 ? (
-							<div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center shadow-md">
+							<div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center shadow-md flex flex-col items-center">
 								<UserCheck size={64} className="mx-auto mb-4 text-gray-700" strokeWidth={1.5} />
 								<p className="text-xl font-medium text-gray-500">No follow-ups yet</p>
 								<p className="mt-2 text-gray-600">Add customers who need follow-up</p>
+								<button
+									onClick={() => setIsAdding(true)}
+									className="py-3 px-6 rounded-xl font-bold transition-all bg-purple-600 hover:bg-purple-700 text-white text-lg mt-6"
+								>
+									+ Add New Follow-Up
+								</button>
 							</div>
 						) : (
 							followUps.map((followUp) => (

@@ -202,11 +202,12 @@ export default function ShortcutTemplatesSection({ isDark }: ShortcutTemplatesSe
             setCopied(template.id);
             setTimeout(() => setCopied(null), 2000);
 
-            // Open WhatsApp Web (optional - user can paste manually)
-            // Uncomment below to auto-open WhatsApp:
-            // const encodedMessage = encodeURIComponent(template.message);
-            // window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-
+            // Show a toast/alert for extra clarity
+            if (window && window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(100);
+            }
+            // Optionally, show a toast (replace with your toast system if available)
+            // alert('Copied! Paste in WhatsApp or anywhere.');
         } catch (err) {
             alert('Failed to copy. Please try again.');
         }
