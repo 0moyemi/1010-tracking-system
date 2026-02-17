@@ -382,7 +382,7 @@ export default function ShortcutTemplatesSection({ isDark }: ShortcutTemplatesSe
                                     ) : (
                                         <>
                                             <Copy size={24} />
-                                            <span>Copy to WhatsApp</span>
+                                            <span>Copy</span>
                                         </>
                                     )}
                                 </button>

@@ -45,6 +45,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* PWA Meta Tags */}
+        <link rel="icon" type="image/png" href="/Secondary Logo.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="application-name" content="Business Tracker" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
