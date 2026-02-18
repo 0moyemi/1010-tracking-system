@@ -1,3 +1,4 @@
+"use client"
 import { useRegisterServiceWorker } from "../lib/useRegisterServiceWorker";
 import { usePushSubscription } from "../lib/usePushSubscription";
 

@@ -1,3 +1,233 @@
 {
-    "devices": {}
+  "devices": {
+    "45ae0e47-740e-4b54-83b2-3c4b9c3ba1b9": {
+      "subscription": {
+        "endpoint": "https://wns2-par02p.notify.windows.com/w/?token=BQYAAAAzBmiR3UDlMg9uSDug1eNz%2bDh6mNps%2bWKSRsI3B4cJ4vLTTiAiDjp9fQHPpcxi3vmH%2f93zRTwMCNhCZj9Jb3ngw5eUi9O5gQvdQ%2bpSyTjlb%2bFb26Izo1sMcHv3rcrye%2bd2RIfIZxkOWhM9KFLDGALMI1Q0CMVIWcyMwM79lkVKxsm2lheZ0XvKWxKDQsjsUj3MD4lxmZa3XbO9yW5Wovelbmk4XlU1gyQBc3ACs5Da73ZxI8b79hOo%2bK4TinKOdvaIUQIWzMpxK4sBpPlpJFtlgWOcDkvuXzHR0Nca80pfb3nuf5%2fpz6WBJVvleN0Jv3KQ24T6aXZ7KQSuY030dwea",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BPwV-0ivmMMprCw3gA6GOgR3ugWkx8geiRZUKKChEixnrqS2kT6SD4bbYngLdYQffbI3_2zfRyvmvjhuVyXbC38",
+          "auth": "3rmoC-zDtoPCSgfYysQHEg"
+        }
+      },
+      "followUps": [
+        {
+          "id": "1771350880143",
+          "customerName": "Mathew",
+          "waNumber": "08036905102",
+          "items": "iphone 4",
+          "dateAdded": "2026-02-17T17:54:40.143Z",
+          "notes": "lazy"
+        },
+        {
+          "id": "1769680121961",
+          "customerName": "Aisha",
+          "items": "Sewn gown",
+          "dateAdded": "2026-01-29T09:48:41.961Z",
+          "notes": "We don't yet have her particular size in store for the Hijab she wants."
+        },
+        {
+          "id": "1769679961578",
+          "customerName": "Rita",
+          "items": "Abaya",
+          "dateAdded": "2026-01-29T09:46:01.578Z",
+          "notes": "She promised to get back to me"
+        }
+      ],
+      "dailyStatus": [
+        {
+          "date": "2025-12-31",
+          "checked": true,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 1
+        },
+        {
+          "date": "2026-01-01",
+          "checked": true,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 2
+        },
+        {
+          "date": "2026-01-02",
+          "checked": true,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 3
+        },
+        {
+          "date": "2026-01-03",
+          "checked": true,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 4
+        },
+        {
+          "date": "2026-01-04",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 5
+        },
+        {
+          "date": "2026-01-05",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 6
+        },
+        {
+          "date": "2026-01-06",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 7
+        },
+        {
+          "date": "2026-01-07",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 8
+        },
+        {
+          "date": "2026-01-08",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 9
+        },
+        {
+          "date": "2026-01-09",
+          "checked": true,
+          "broadcastAllowed": true,
+          "daysSinceLastBroadcast": 10
+        },
+        {
+          "date": "2026-01-10",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-11",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-12",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-13",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-14",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-15",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-16",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-17",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-18",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-19",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-20",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-21",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-22",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-23",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-24",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-25",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-26",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-27",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-28",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-29",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        },
+        {
+          "date": "2026-01-30",
+          "checked": false,
+          "broadcastAllowed": false,
+          "daysSinceLastBroadcast": 0
+        }
+      ],
+      "broadcasts": [
+        {
+          "id": "1771351496933",
+          "date": "2026-01-05",
+          "checked": true
+        }
+      ]
+    }
+  }
 }

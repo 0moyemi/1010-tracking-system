@@ -1,4 +1,3 @@
-// pages/api/push/cron.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllScheduledNotifications } from '@/app/lib/pushStore';
 import { getAllDevices } from '@/app/lib/pushStore';
@@ -14,11 +13,8 @@ webpush.setVapidDetails(
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // 1. Get all scheduled notifications for now (or next X minutes)
     const notifications = await getAllScheduledNotifications();
-    // 2. Get all device subscriptions
     const devices = await getAllDevices();
-    // 3. Send notifications
     let sentCount = 0;
     for (const notif of notifications) {
         for (const device of devices) {

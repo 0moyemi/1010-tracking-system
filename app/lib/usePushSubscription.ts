@@ -1,13 +1,17 @@
+
+"use client"
 import { useEffect, useState } from "react";
 
 export function usePushSubscription(vapidPublicKey: string) {
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
-    const [permission, setPermission] = useState(Notification.permission);
+    const [permission, setPermission] = useState(
+        typeof window !== "undefined" && "Notification" in window ? Notification.permission : "default"
+    );
 
     useEffect(() => {
         if (typeof window === "undefined" || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        setPermission(Notification.permission);
         navigator.serviceWorker.ready.then(async (reg) => {
-            setPermission(Notification.permission);
             if (Notification.permission !== "granted") return;
             const existing = await reg.pushManager.getSubscription();
             if (existing) {

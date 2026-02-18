@@ -8,7 +8,7 @@ export default function Home() {
 
     useEffect(() => {
         // Redirect to orders page by default
-        router.replace('/orders');
+        // router.replace('/orders'); // Removed: Orders section no longer exists
     }, [router]);
 
     return null;
