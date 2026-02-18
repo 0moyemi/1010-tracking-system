@@ -2,8 +2,7 @@
     "crons": [
         {
             "path": "/api/push/reminders",
-            "schedule": "0 10 * * *",
-            "timezone": "Africa/Lagos"
+            "schedule": "0 9 * * *"
         }
     ]
 }
