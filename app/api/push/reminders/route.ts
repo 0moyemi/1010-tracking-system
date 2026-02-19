@@ -202,6 +202,7 @@ export async function GET() {
                             auth: keys.auth
                         }
                     };
+                    console.log('Sending push to:', pushSub, notification);
                     await webpush.sendNotification(pushSub as any, JSON.stringify(notification));
                     sent.push(notification.tag);
                 } catch (err: any) {

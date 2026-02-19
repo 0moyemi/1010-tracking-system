@@ -27,6 +27,8 @@ export function PushNotificationSetup() {
                 localStorage.setItem("deviceId", deviceId);
             }
         }
+        // Log the VAPID key before subscribing
+        console.log('VAPID key:', vapidKey);
         // Send subscription to backend when permission is granted
         if (permission === "granted" && subscription && deviceId) {
             fetch("/api/push/subscribe", {
@@ -35,7 +37,7 @@ export function PushNotificationSetup() {
                 body: JSON.stringify({ deviceId, subscription }),
             });
         }
-    }, [permission, subscription]);
+    }, [permission, subscription, vapidKey]);
 
     return null;
 }

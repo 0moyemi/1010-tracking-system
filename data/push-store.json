@@ -1,6 +1,14 @@
 {
   "devices": {
-    "206ef3fe-a600-482d-b839-9cc226ed98d7": {
+    "1771538987243-6kv34fnb10y": {
+      "subscription": {
+        "endpoint": "https://wns2-par02p.notify.windows.com/w/?token=BQYAAABcq6D8DZkxbvwambYA%2fdlcGsAVg2s5jub3pbVSMQIEbXdXhmlk6dVNyUskzQmXg2UCMFeLv75hdcuJVBWSv5rWXVgiBXELNBYbuEYhcre%2bJuFxNK8AowFI1cZPyuR8xV8AfY7iZD6tiZbTp6foj8gU3waBjoFB2anL4xMmwR%2fxyBMmKos6%2bEoCJwEMIq9LUbyqPtjifHVjRPZRsNTawQzAZJUZMpfVu8jx4u60Ficmn%2bVGRmcZqvpcZaRdoAJkWP%2fk%2bQp2JwGT255oPFPijl5s05Q5GWoZLYZMS%2bQbm9lEPhtAkVbnLe51s%2bES6cxqonc%3d",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BKrzKEUi6wHbTOLvXVsHdZ_71rFH4tOeMrfR5-uyk71OcGnZiPrkRAlUMQoV1eYvpkeWD-qfbWeK1oMJjznPCss",
+          "auth": "e5rFSfIbHgnXUjj66rVvPw"
+        }
+      },
       "followUps": [],
       "dailyStatus": [
         {
@@ -116,23 +124,7 @@
           "checked": false
         }
       ],
-      "broadcasts": [
-        {
-          "id": "1771511968741",
-          "date": "2026-02-05",
-          "checked": true
-        }
-      ],
-      "subscription": {
-        "endpoint": "https://wns2-par02p.notify.windows.com/w/?token=BQYAAAAwR3Nsu9VNHO4mzUat9deeWK46ZyPrbig3p%2fcamtlJ9cG5pUkphg1VqDAtmjr%2bls9Fv2b%2fmUFleU1gHewjPV6vELVIDtfQdRfDkBZoxKGUviy8dSHE3OlGlaNrDUGvs8PLXxa2T1c2RdDBss8jJWO4%2fsmW59gaJSf3PZZoxPgR6nrxxeN2yhjvizDYs%2b%2b9K8bReOZGd%2fb%2bTqmfynQLMHUK01ZYcNjxVQXstI%2ftckmgPd%2fHlvaaYvhgDD0NcMlnNtW2JbFFy6TwYuQI3dnJqV4PSZ0WMYwbnBSnU3cW71kqlrVQnQLpTOFkum%2b0Ec%2fTGrHtY%2f3PoKaB%2f3PPxN%2bS9Xz%2b",
-        "expirationTime": null,
-        "keys": {
-          "p256dh": "BElTfVn0nZt0901GlLKFFqIzsZB8SXOaIsOrawfkQE4PiFqnqebRXmqp9ie6SGSGF4yJh5XaBRLgZcNJ-9tEdvk",
-          "auth": "eylK5E_wKZorYvuhsd1xGg"
-        }
-      },
-      "lastDailyStatusReminderDate": "2026-02-19",
-      "followUpReminderMap": {},
+      "broadcasts": [],
       "scheduledPosts": []
     }
   }

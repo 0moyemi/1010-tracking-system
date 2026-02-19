@@ -9,21 +9,47 @@ export function usePushSubscription(vapidPublicKey: string) {
     );
 
     useEffect(() => {
-        if (typeof window === "undefined" || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        if (
+            typeof window === "undefined" ||
+            !('serviceWorker' in navigator) ||
+            !('PushManager' in window) ||
+            !vapidPublicKey
+        ) return;
+
         setPermission(Notification.permission);
-        navigator.serviceWorker.ready.then(async (reg) => {
-            if (Notification.permission !== "granted") return;
-            const existing = await reg.pushManager.getSubscription();
-            if (existing) {
-                setSubscription(existing);
-                return;
+
+        (async () => {
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                if (Notification.permission !== "granted") return;
+                const existing = await reg.pushManager.getSubscription();
+                if (existing) {
+                    setSubscription(existing);
+                    console.log('Push subscription already exists:', existing);
+                    return;
+                }
+                // Convert VAPID key to Uint8Array and validate
+                let appServerKey: Uint8Array | null = null;
+                try {
+                    appServerKey = urlBase64ToUint8Array(vapidPublicKey);
+                } catch (e) {
+                    console.error('Invalid VAPID public key format', e);
+                    return;
+                }
+                if (!appServerKey || !(appServerKey instanceof Uint8Array)) {
+                    console.error('VAPID key conversion failed');
+                    return;
+                }
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: appServerKey,
+                });
+                setSubscription(sub);
+                console.log('Push subscription successful:', sub);
+            } catch (e) {
+                console.error('Push subscription failed', e);
             }
-            const sub = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-            });
-            setSubscription(sub);
-        });
+        })();
     }, [vapidPublicKey]);
 
     return { subscription, permission };
