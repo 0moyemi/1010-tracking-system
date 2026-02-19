@@ -18,13 +18,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Business Tracker - Nigerian SME App",
-  description: "Mobile-first business tracking app for Nigerian SME owners. Track orders, daily status, broadcasts, and use WhatsApp templates.",
+  title: "Sales Assistant - Never Miss a Beat",
+  description:
+    "Your smart sales assistant for busy business owners. Get reminders, stay on top of sales, and keep your business running—even when you're busy or tired. Never forget a follow-up, order, or daily task again.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "BizTracker",
+    title: "Sales Assistant",
   },
   formatDetection: {
     telephone: false,
@@ -50,10 +51,10 @@ export default function RootLayout({
         {/* PWA Meta Tags */}
         <link rel="icon" type="image/png" href="/Secondary Logo.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="application-name" content="Business Tracker" />
+        <meta name="application-name" content="Sales Assistant" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="BizTracker" />
+        <meta name="apple-mobile-web-app-title" content="Sales Assistant" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#081F44" />
