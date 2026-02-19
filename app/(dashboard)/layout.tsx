@@ -16,15 +16,19 @@ export default function DashboardLayout({
 
     // Load dark mode preference from localStorage
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            setIsDark(true);
+        if (typeof window !== "undefined") {
+            const savedTheme = window.localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                setIsDark(true);
+            }
         }
     }, []);
 
     // Save dark mode preference
     useEffect(() => {
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        if (typeof window !== "undefined") {
+            window.localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
     }, [isDark]);
 
     const toggleTheme = () => setIsDark(!isDark);

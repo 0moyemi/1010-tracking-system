@@ -8,34 +8,40 @@ const DEVICE_ID_KEY = 'deviceId';
 const urlBase64ToUint8Array = (base64String: string) => {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
+    let rawData = "";
+    if (typeof window !== "undefined") {
+        rawData = window.atob(base64);
+    }
     return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
 };
 
 const getDeviceId = () => {
-    let deviceId = localStorage.getItem(DEVICE_ID_KEY);
-    if (!deviceId) {
-        deviceId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-            ? crypto.randomUUID()
-            : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    let deviceId = "";
+    if (typeof window !== "undefined") {
+        deviceId = window.localStorage.getItem(DEVICE_ID_KEY);
+        if (!deviceId) {
+            deviceId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+                ? crypto.randomUUID()
+                : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            window.localStorage.setItem(DEVICE_ID_KEY, deviceId);
+        }
     }
     return deviceId;
 };
 
 export default function NotificationManager() {
     useEffect(() => {
-        if (!('Notification' in window)) return;
+        if (typeof window === "undefined" || !('Notification' in window)) return;
 
-        const asked = localStorage.getItem(NOTIF_PERMISSION_KEY);
-        if (Notification.permission === 'default' && !asked) {
-            localStorage.setItem(NOTIF_PERMISSION_KEY, 'true');
-            Notification.requestPermission();
+        const asked = window.localStorage.getItem(NOTIF_PERMISSION_KEY);
+        if (window.Notification.permission === 'default' && !asked) {
+            window.localStorage.setItem(NOTIF_PERMISSION_KEY, 'true');
+            window.Notification.requestPermission();
         }
     }, []);
 
     useEffect(() => {
-        if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+        if (typeof window === "undefined" || !('Notification' in window) || !('serviceWorker' in navigator)) return;
 
         const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
         if (!publicKey) return;
