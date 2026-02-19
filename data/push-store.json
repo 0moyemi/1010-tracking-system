@@ -130,7 +130,10 @@
           "p256dh": "BElTfVn0nZt0901GlLKFFqIzsZB8SXOaIsOrawfkQE4PiFqnqebRXmqp9ie6SGSGF4yJh5XaBRLgZcNJ-9tEdvk",
           "auth": "eylK5E_wKZorYvuhsd1xGg"
         }
-      }
+      },
+      "lastDailyStatusReminderDate": "2026-02-19",
+      "followUpReminderMap": {},
+      "scheduledPosts": []
     }
   }
 }

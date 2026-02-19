@@ -104,12 +104,14 @@ export async function GET() {
 
         const results: Array<{ deviceId: string; sent: string[] }> = [];
 
+
         for (const [deviceId, device] of Object.entries(store.devices)) {
             const sent: string[] = [];
             const followUps = device.followUps || [];
             const dailyStatus = device.dailyStatus || [];
             const broadcasts = device.broadcasts || [];
             const followUpReminderMap = device.followUpReminderMap || {};
+            let scheduledPosts = Array.isArray(device.scheduledPosts) ? [...device.scheduledPosts] : [];
 
             if (!device.subscription) {
                 results.push({ deviceId, sent });
@@ -118,6 +120,7 @@ export async function GET() {
 
             const notifications: Array<{ title: string; body: string; tag: string }> = [];
 
+            // --- Existing notification logic ---
             if (dailyStatus.length > 0 && shouldSendDailyStatus(dailyStatus, today, device.lastDailyStatusReminderDate)) {
                 notifications.push({
                     title: 'Daily status reminder',
@@ -156,6 +159,31 @@ export async function GET() {
                 followUpReminderMap[followUp.id] = sentDates;
             });
 
+            // --- Scheduled Posts Notification Logic ---
+            const dueScheduledPosts = scheduledPosts.filter(
+                (post) => {
+                    if (post.notificationSent) return false;
+                    // Check if post is due: date is today and time is now or earlier
+                    if (post.date !== today) return false;
+                    // Compare time (HH:mm)
+                    const [postHour, postMin] = post.time.split(":").map(Number);
+                    const nowHour = now.getHours();
+                    const nowMin = now.getMinutes();
+                    if (postHour < nowHour || (postHour === nowHour && postMin <= nowMin)) {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+
+            for (const post of dueScheduledPosts) {
+                notifications.push({
+                    title: 'Scheduled Post Reminder',
+                    body: post.caption,
+                    tag: `scheduled-post-${post.id}`,
+                });
+            }
+
             if (notifications.length === 0) {
                 results.push({ deviceId, sent });
                 continue;
@@ -183,10 +211,19 @@ export async function GET() {
                 }
             }
 
+            // Mark scheduledPosts as notificationSent if sent
+            if (dueScheduledPosts.length > 0) {
+                const sentIds = new Set(dueScheduledPosts.map(p => p.id));
+                scheduledPosts = scheduledPosts.map(post =>
+                    sentIds.has(post.id) ? { ...post, notificationSent: true } : post
+                );
+            }
+
             await updateDevice(deviceId, {
                 lastDailyStatusReminderDate: notifications.some(n => n.tag === 'daily-status') ? today : device.lastDailyStatusReminderDate,
                 lastBroadcastReminderDate: notifications.some(n => n.tag === 'broadcast-day') ? today : device.lastBroadcastReminderDate,
                 followUpReminderMap,
+                scheduledPosts,
             });
 
             results.push({ deviceId, sent });

@@ -3,7 +3,7 @@ import { upsertDevice } from '@/app/lib/pushStore';
 
 export async function POST(req: Request) {
     try {
-        const { deviceId, followUps, dailyStatus, broadcasts } = await req.json();
+        const { deviceId, followUps, dailyStatus, broadcasts, scheduledPosts } = await req.json();
 
         if (!deviceId) {
             return NextResponse.json({ error: 'Missing deviceId.' }, { status: 400 });
@@ -13,6 +13,7 @@ export async function POST(req: Request) {
             followUps: Array.isArray(followUps) ? followUps : [],
             dailyStatus: Array.isArray(dailyStatus) ? dailyStatus : [],
             broadcasts: Array.isArray(broadcasts) ? broadcasts : [],
+            scheduledPosts: Array.isArray(scheduledPosts) ? scheduledPosts : [],
         });
 
         return NextResponse.json({ ok: true });

@@ -19,11 +19,21 @@ export const getAllScheduledNotifications = async () => {
 import { promises as fs } from 'fs';
 import path from 'path';
 
+export interface ScheduledPostBackend {
+    id: string;
+    date: string; // YYYY-MM-DD
+    time: string; // HH:mm
+    mediaType: "image" | "video";
+    caption: string;
+    notificationSent?: boolean;
+}
+
 export interface DeviceRecord {
     subscription?: PushSubscriptionJSON;
     followUps?: any[];
     dailyStatus?: any[];
     broadcasts?: any[];
+    scheduledPosts?: ScheduledPostBackend[];
     lastDailyStatusReminderDate?: string;
     lastBroadcastReminderDate?: string;
     followUpReminderMap?: Record<string, string | string[]>;
