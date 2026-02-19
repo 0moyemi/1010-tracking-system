@@ -22,6 +22,7 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     const [firstUseDate, setFirstUseDate] = useState<string | null>(null);
     const [monthStatus, setMonthStatus] = useState<DayStatus[]>([]);
     const [broadcasts, setBroadcasts] = useState<BroadcastRecord[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
     // On mount, set or get first use date
     useEffect(() => {
@@ -37,29 +38,49 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
 
     // On mount, load or reset month data
     useEffect(() => {
-        const savedStatus = localStorage.getItem("dailyStatus");
-        const savedMonth = localStorage.getItem("dailyStatusMonth");
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
-        if (savedMonth !== currentMonth) {
-            // Save summary of last month if exists
-            if (savedStatus && savedMonth) {
-                localStorage.setItem("dailyStatusSummary_" + savedMonth, savedStatus);
+        try {
+            const savedStatus = localStorage.getItem("dailyStatus");
+            const savedMonth = localStorage.getItem("dailyStatusMonth");
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
+            if (savedMonth !== currentMonth) {
+                // Save summary of last month if exists
+                if (savedStatus && savedMonth) {
+                    localStorage.setItem("dailyStatusSummary_" + savedMonth, savedStatus);
+                }
+                // Reset for new month
+                const days = generateMonthDays();
+                setMonthStatus(days);
+                localStorage.setItem("dailyStatusMonth", currentMonth);
+                localStorage.removeItem("dailyStatus");
+            } else if (savedStatus) {
+                try {
+                    const parsed = JSON.parse(savedStatus);
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].date) {
+                        setMonthStatus(parsed);
+                    } else {
+                        setMonthStatus(generateMonthDays());
+                    }
+                } catch (e) {
+                    setMonthStatus(generateMonthDays());
+                }
+            } else {
+                const days = generateMonthDays();
+                setMonthStatus(days);
             }
-            // Reset for new month
-            const days = generateMonthDays();
-            setMonthStatus(days);
-            localStorage.setItem("dailyStatusMonth", currentMonth);
-            localStorage.removeItem("dailyStatus");
-        } else if (savedStatus) {
-            setMonthStatus(JSON.parse(savedStatus));
-        } else {
-            const days = generateMonthDays();
-            setMonthStatus(days);
-        }
-        const savedBroadcasts = localStorage.getItem("broadcasts");
-        if (savedBroadcasts) {
-            setBroadcasts(JSON.parse(savedBroadcasts));
+            const savedBroadcasts = localStorage.getItem("broadcasts");
+            if (savedBroadcasts) {
+                try {
+                    const parsed = JSON.parse(savedBroadcasts);
+                    if (Array.isArray(parsed)) {
+                        setBroadcasts(parsed);
+                    }
+                } catch (e) {
+                    setBroadcasts([]);
+                }
+            }
+        } catch (e) {
+            setError("Failed to load daily status data. Please clear your browser storage and reload.");
         }
     }, []);
 
@@ -82,11 +103,15 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = now.getDate();
         const days: DayStatus[] = [];
+        // Always generate at least one day (today)
         for (let day = today; day <= daysInMonth; day++) {
-            // Only generate days for the current month, starting from today
             const date = new Date(year, month, day);
-            // Defensive: skip if month changed (shouldn't happen, but just in case)
             if (date.getMonth() !== month) continue;
+            days.push({ date: date.toISOString().split("T")[0], checked: false });
+        }
+        // If for some reason no days were generated, add today
+        if (days.length === 0) {
+            const date = new Date(year, month, today);
             days.push({ date: date.toISOString().split("T")[0], checked: false });
         }
         return days;
@@ -170,6 +195,29 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     }
 
     const progress = calculateProgress();
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-950">
+                <div className="bg-red-900/80 p-8 rounded-2xl shadow-lg border-2 border-red-700 max-w-md mx-auto">
+                    <h2 className="text-2xl font-bold text-white mb-4">Application Error</h2>
+                    <p className="text-red-200 mb-2">{error}</p>
+                    <p className="text-gray-300 text-sm">Try clearing your browser's local storage and reloading the page.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!monthStatus || monthStatus.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-950">
+                <div className="bg-yellow-900/80 p-8 rounded-2xl shadow-lg border-2 border-yellow-700 max-w-md mx-auto">
+                    <h2 className="text-2xl font-bold text-white mb-4">No Days Available</h2>
+                    <p className="text-yellow-200 mb-2">No days could be generated for this month. Please check your system date or reload the page.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-950 lg:pl-72">
