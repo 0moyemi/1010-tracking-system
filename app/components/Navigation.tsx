@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ChevronUp, ChevronDown, Package, CheckCircle, MessageSquare, UserCheck } from "lucide-react";
 
-export default function Navigation() {
+type NavigationProps = {
+    isDark: boolean;
+    toggleTheme: () => void;
+};
+
+export default function Navigation({ isDark, toggleTheme }: NavigationProps) {
     const pathname = usePathname();
     const [showMobileNav, setShowMobileNav] = useState(true);
 
@@ -55,7 +60,7 @@ export default function Navigation() {
                                     className={`flex flex-col items-center justify-center gap-2.5 py-5 px-4 rounded-2xl font-bold transition-all shadow-sm ${isActive(item.href)
                                         ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg scale-105"
                                         : "text-gray-300 bg-gray-800 hover:bg-gray-700 hover:shadow-md active:scale-95"
-                                    }`}
+                                        }`}
                                 >
                                     <Icon size={32} strokeWidth={2.5} />
                                     <span className="text-xs leading-tight text-center">{item.label}</span>
@@ -88,7 +93,7 @@ export default function Navigation() {
                                 className={`flex items-center gap-4 px-5 py-4 rounded-xl font-semibold transition-all ${isActive(item.href)
                                     ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
                                     : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                                }`}
+                                    }`}
                             >
                                 <Icon size={24} strokeWidth={2.5} />
                                 <span className="text-base">{item.label}</span>

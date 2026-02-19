@@ -11,9 +11,9 @@ interface Template {
     icon: string;
 }
 
-interface ShortcutTemplatesSectionProps {
-    isDark: boolean;
-}
+type ShortcutTemplatesSectionProps = {
+    isDark?: boolean;
+};
 
 export const defaultTemplates: Template[] = [
     {
@@ -115,7 +115,7 @@ Stay blessed! 🙏
     }
 ];
 
-export default function ShortcutTemplatesSection({ isDark }: ShortcutTemplatesSectionProps) {
+export default function ShortcutTemplatesSection({ isDark = false }: ShortcutTemplatesSectionProps) {
     const [templates, setTemplates] = useState<Template[]>([]);
     const [copied, setCopied] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
@@ -214,192 +214,187 @@ export default function ShortcutTemplatesSection({ isDark }: ShortcutTemplatesSe
     };
 
     return (
-        <div className={`p-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-            {/* Section Title - Sticky */}
-            <div className={`sticky top-0 z-10 pb-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <div className="flex items-center gap-3 mb-6">
-                    <MessageSquare size={32} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
-                    <h2 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-[#081F44]'}`}>
-                        Message Templates
-                    </h2>
+        <div className="min-h-screen bg-gray-950 lg:pl-72">
+            <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+                {/* Section Title - Sticky */}
+                <div className="mb-4">
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="p-3 rounded-xl bg-blue-900/30">
+                                <MessageSquare size={28} className="text-blue-400" strokeWidth={2.5} />
+                            </div>
+                            <h1 className="text-3xl lg:text-4xl font-bold text-white">Message Templates</h1>
+                        </div>
+                        <p className="text-gray-400 text-lg">Save and quickly copy WhatsApp message templates</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/20 border border-blue-800/50 rounded-2xl p-6 mb-6 shadow-lg">
+                        <div className="flex items-start gap-3">
+                            <Copy size={24} className="text-blue-200 flex-shrink-0 mt-1" />
+                            <div>
+                                <p className="text-white text-base leading-relaxed">
+                                    <strong className="text-lg">Quick Copy:</strong><br />
+                                    Tap any template to copy it, then paste into WhatsApp to send to your customers!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Instructions */}
-                <div className={`p-5 rounded-xl mb-6 border-2 ${isDark ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-[#081F44] to-blue-800'} shadow-lg`}>
-                    <div className="flex items-start gap-3">
-                        <Copy size={24} className="text-blue-200 flex-shrink-0 mt-1" />
-                        <div>
-                            <p className="text-white text-base leading-relaxed">
-                                <strong className="text-lg">Quick Copy:</strong><br />
-                                Tap any template to copy it, then paste into WhatsApp to send to your customers!
+                {/* Add New Template Button */}
+                {!isAdding && !editingId && (
+                    <button
+                        onClick={() => setIsAdding(true)}
+                        className="w-full mb-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-lg font-bold py-4 rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                    >
+                        <Plus size={24} />
+                        <span>Add New Template</span>
+                    </button>
+                )}
+
+                {/* Add/Edit Template Form */}
+                {(isAdding || editingId) && (
+                    <div className={`mb-6 p-6 rounded-xl border-2 ${isDark ? 'bg-gray-800 border-green-500' : 'bg-white border-green-400'} shadow-lg`}>
+                        <div className="flex items-center gap-3 mb-5">
+                            {editingId ? <Edit2 size={24} className="text-green-500" /> : <Plus size={24} className="text-green-500" />}
+                            <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#081F44]'}`}>
+                                {editingId ? 'Edit Template' : 'New Template'}
+                            </h3>
+                        </div>
+
+                        <input
+                            type="text"
+                            placeholder="Template title (e.g., New Order Confirmation)"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 ${isDark
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
+                                : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                                }`}
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Icon (emoji, e.g., ✅ 🚚 📦)"
+                            value={formData.icon}
+                            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                            className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 ${isDark
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
+                                : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                                }`}
+                        />
+
+                        <textarea
+                            placeholder="Template message..."
+                            value={formData.message}
+                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                            rows={8}
+                            className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 resize-none ${isDark
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
+                                : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                                }`}
+                        />
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={cancelForm}
+                                className={`py-4 text-lg font-bold rounded-xl transition-all ${isDark
+                                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    } active:scale-95`}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={editingId ? handleEditTemplate : handleAddTemplate}
+                                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 text-lg font-bold rounded-xl active:scale-95 transition-all shadow-md hover:shadow-lg"
+                            >
+                                {editingId ? 'Save Changes' : 'Add Template'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Templates Grid */}
+                <div className="space-y-4">
+                    {templates.length === 0 ? (
+                        <div className="text-center py-12 bg-gray-950 rounded-xl border-2 border-dashed border-blue-700">
+                            <MessageSquare size={48} className="mx-auto mb-3 text-blue-600" />
+                            <p className="text-lg text-gray-400">
+                                No templates yet. Tap "Add New Template" to create one.
                             </p>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Add New Template Button */}
-            {!isAdding && !editingId && (
-                <button
-                    onClick={() => setIsAdding(true)}
-                    className="w-full mb-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-lg font-bold py-4 rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
-                >
-                    <Plus size={24} />
-                    <span>Add New Template</span>
-                </button>
-            )}
-
-            {/* Add/Edit Template Form */}
-            {(isAdding || editingId) && (
-                <div className={`mb-6 p-6 rounded-xl border-2 ${isDark ? 'bg-gray-800 border-green-500' : 'bg-white border-green-400'} shadow-lg`}>
-                    <div className="flex items-center gap-3 mb-5">
-                        {editingId ? <Edit2 size={24} className="text-green-500" /> : <Plus size={24} className="text-green-500" />}
-                        <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#081F44]'}`}>
-                            {editingId ? 'Edit Template' : 'New Template'}
-                        </h3>
-                    </div>
-
-                    <input
-                        type="text"
-                        placeholder="Template title (e.g., New Order Confirmation)"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 ${isDark
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
-                            : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
-                            }`}
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Icon (emoji, e.g., ✅ 🚚 📦)"
-                        value={formData.icon}
-                        onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                        className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 ${isDark
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
-                            : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
-                            }`}
-                    />
-
-                    <textarea
-                        placeholder="Template message..."
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        rows={8}
-                        className={`w-full p-4 text-lg rounded-xl mb-4 border-2 transition-all focus:ring-2 focus:ring-green-500 resize-none ${isDark
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500'
-                            : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
-                            }`}
-                    />
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={cancelForm}
-                            className={`py-4 text-lg font-bold rounded-xl transition-all ${isDark
-                                ? 'bg-gray-700 text-white hover:bg-gray-600'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                } active:scale-95`}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={editingId ? handleEditTemplate : handleAddTemplate}
-                            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 text-lg font-bold rounded-xl active:scale-95 transition-all shadow-md hover:shadow-lg"
-                        >
-                            {editingId ? 'Save Changes' : 'Add Template'}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Templates Grid */}
-            <div className="space-y-4">
-                {templates.length === 0 ? (
-                    <div className={`text-center py-12 ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl border-2 border-dashed ${isDark ? 'border-gray-700' : 'border-gray-300'}`}>
-                        <MessageSquare size={48} className={`mx-auto mb-3 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
-                        <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                            No templates yet. Tap "Add New Template" to create one.
-                        </p>
-                    </div>
-                ) : (
-                    templates.map(template => (
-                        <div
-                            key={template.id}
-                            className={`rounded-xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                                }`}
-                        >
-                            {/* Template Header */}
-                            <div className={`p-5 ${isDark ? 'bg-gray-700' : 'bg-gradient-to-r from-gray-50 to-gray-100'}`}>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-3xl">{template.icon}</span>
-                                    <h3 className={`text-lg font-bold flex-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {template.title}
-                                    </h3>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => startEdit(template)}
-                                            className={`p-2 rounded-lg transition-all ${isDark
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
-                                                }`}
-                                            title="Edit template"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteTemplate(template.id)}
-                                            className={`p-2 rounded-lg transition-all ${isDark
-                                                ? 'bg-red-600 hover:bg-red-700 text-white'
-                                                : 'bg-red-100 hover:bg-red-200 text-red-700'
-                                                }`}
-                                            title="Delete template"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                    ) : (
+                        templates.map(template => (
+                            <div
+                                key={template.id}
+                                className="rounded-xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all bg-gray-950 border-blue-700"
+                            >
+                                {/* Template Header */}
+                                <div className="p-5 bg-gray-950">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-3xl">{template.icon}</span>
+                                        <h3 className="text-lg font-bold flex-1 text-white">
+                                            {template.title}
+                                        </h3>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => startEdit(template)}
+                                                className="p-2 rounded-lg transition-all bg-blue-700 hover:bg-blue-800 text-white"
+                                                title="Edit template"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteTemplate(template.id)}
+                                                className="p-2 rounded-lg transition-all bg-red-700 hover:bg-red-800 text-white"
+                                                title="Delete template"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+
+                                {/* Template Preview */}
+                                <div className="p-5">
+                                    <pre className="text-sm whitespace-pre-wrap font-sans mb-4 text-gray-300">
+                                        {template.message}
+                                    </pre>
+
+                                    {/* Copy Button */}
+                                    <button
+                                        onClick={() => copyToWhatsApp(template)}
+                                        className={`w-full py-4 text-lg font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${copied === template.id
+                                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white'
+                                            : 'bg-gradient-to-r from-blue-700 to-blue-900 text-white hover:from-blue-800 hover:to-blue-950 active:scale-95 shadow-md hover:shadow-lg'
+                                            }`}
+                                    >
+                                        {copied === template.id ? (
+                                            <>
+                                                <CheckCheck size={24} />
+                                                <span>Copied!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy size={24} />
+                                                <span>Copy</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
+                        ))
+                    )}
+                </div>
 
-                            {/* Template Preview */}
-                            <div className="p-5">
-                                <pre className={`text-sm whitespace-pre-wrap font-sans mb-4 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    {template.message}
-                                </pre>
-
-                                {/* Copy Button */}
-                                <button
-                                    onClick={() => copyToWhatsApp(template)}
-                                    className={`w-full py-4 text-lg font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${copied === template.id
-                                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white'
-                                        : 'bg-gradient-to-r from-[#081F44] to-blue-800 text-white hover:from-blue-700 hover:to-blue-900 active:scale-95 shadow-md hover:shadow-lg'
-                                        }`}
-                                >
-                                    {copied === template.id ? (
-                                        <>
-                                            <CheckCheck size={24} />
-                                            <span>Copied!</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Copy size={24} />
-                                            <span>Copy</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-
-            {/* Additional Info */}
-            <div className={`mt-6 p-5 rounded-xl ${isDark ? 'bg-gray-800 border-2 border-gray-700' : 'bg-blue-50 border-2 border-blue-200'}`}>
-                <div className="flex items-start gap-3">
-                    <MessageSquare size={20} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
-                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <strong>Tip:</strong> Replace [ITEM], [PRICE], [DATE], etc. with your actual order details before sending.
-                    </p>
+                {/* Additional Info */}
+                <div className="mt-6 p-5 rounded-xl bg-gray-950 border-2 border-blue-700">
+                    <div className="flex items-start gap-3">
+                        <MessageSquare size={20} className="text-blue-400" />
+                        <p className="text-sm text-gray-300">
+                            <strong>Tip:</strong> Replace [ITEM], [PRICE], [DATE], etc. with your actual order details before sending.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

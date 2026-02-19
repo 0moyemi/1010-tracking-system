@@ -10,11 +10,11 @@ interface BroadcastRecord {
     checked: boolean;
 }
 
-interface BroadcastsSectionProps {
-    isDark: boolean;
-}
+type BroadcastsSectionProps = {
+    isDark?: boolean;
+};
 
-export default function BroadcastsSection({ isDark }: BroadcastsSectionProps) {
+export default function BroadcastsSection({ isDark = false }: BroadcastsSectionProps) {
     const [broadcasts, setBroadcasts] = useState<BroadcastRecord[]>([]);
     const [canBroadcast, setCanBroadcast] = useState(false);
 

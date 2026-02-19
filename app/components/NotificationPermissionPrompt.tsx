@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 
-export function NotificationPermissionPrompt() {
+export default function NotificationPermissionPrompt() {
     const [visible, setVisible] = useState(false);
     const [permission, setPermission] = useState(
         typeof window !== "undefined" ? Notification.permission : "default"

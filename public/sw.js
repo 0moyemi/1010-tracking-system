@@ -65,39 +65,44 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // Cache hit - return response from cache
-                if (response) {
-                    return response;
-                }
-
-                // Clone the request
-                const fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest).then((response) => {
-                    // Check if valid response
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
+    if (event.request.method === 'GET') {
+        event.respondWith(
+            caches.match(event.request)
+                .then((response) => {
+                    // Cache hit - return response from cache
+                    if (response) {
                         return response;
                     }
 
-                    // Clone the response
-                    const responseToCache = response.clone();
+                    // Clone the request
+                    const fetchRequest = event.request.clone();
 
-                    // Cache the new response
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            cache.put(event.request, responseToCache);
-                        });
+                    return fetch(fetchRequest).then((response) => {
+                        // Check if valid response
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
 
-                    return response;
-                }).catch(() => {
-                    // Network failed, try to serve offline page
-                    return caches.match(OFFLINE_URL);
-                });
-            })
-    );
+                        // Clone the response
+                        const responseToCache = response.clone();
+
+                        // Cache the new response
+                        caches.open(CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(event.request, responseToCache);
+                            });
+
+                        return response;
+                    }).catch(() => {
+                        // Network failed, try to serve offline page
+                        return caches.match(OFFLINE_URL);
+                    });
+                })
+        );
+    } else {
+        // For POST or other methods, just fetch normally without caching
+        event.respondWith(fetch(event.request));
+    }
 });
 
 // Focus or open the app when a notification is clicked

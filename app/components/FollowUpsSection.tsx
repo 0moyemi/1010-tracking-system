@@ -20,7 +20,11 @@ interface MessageTemplate {
 	message: string;
 }
 
-export default function FollowUpsSection() {
+type FollowUpsSectionProps = {
+	isDark?: boolean;
+};
+
+export default function FollowUpsSection({ isDark = false }: FollowUpsSectionProps) {
 	const [followUps, setFollowUps] = useState<FollowUp[]>([]);
 	const [newCustomerName, setNewCustomerName] = useState("");
 	const [newWaNumber, setNewWaNumber] = useState("");

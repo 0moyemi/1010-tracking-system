@@ -53,7 +53,11 @@ function getMonthDays(year: number, month: number) {
 	return days;
 }
 
-export default function ScheduleSection() {
+type ScheduleSectionProps = {
+	isDark?: boolean;
+};
+
+export default function ScheduleSection({ isDark = false }: ScheduleSectionProps) {
 	const [schedule, setSchedule] = useState<ScheduleMap>({});
 	const [selectedDay, setSelectedDay] = useState(getTodayISO());
 	const [showAdd, setShowAdd] = useState(false);

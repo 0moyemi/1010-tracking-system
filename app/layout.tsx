@@ -5,7 +5,7 @@ import Script from "next/script";
 import NotificationManager from "./components/NotificationManager";
 import { PushNotificationSetup } from "./components/PushNotificationSetup";
 import { getVapidPublicKey } from "./lib/getVapidPublicKey";
-import { NotificationPermissionPrompt } from "./components/NotificationPermissionPrompt";
+import NotificationPermissionPrompt from "./components/NotificationPermissionPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

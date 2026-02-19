@@ -13,11 +13,11 @@ export interface Order {
     price: number;
 }
 
-interface OrdersSectionProps {
-    isDark: boolean;
-}
+type OrdersSectionProps = {
+    isDark?: boolean;
+};
 
-export default function OrdersSection({ isDark }: OrdersSectionProps) {
+export default function OrdersSection({ isDark = false }: OrdersSectionProps) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [newItem, setNewItem] = useState('');
     const [newPrice, setNewPrice] = useState('');
