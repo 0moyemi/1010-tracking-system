@@ -18,7 +18,8 @@ const urlBase64ToUint8Array = (base64String: string) => {
 const getDeviceId = () => {
     let deviceId = "";
     if (typeof window !== "undefined") {
-        deviceId = window.localStorage.getItem(DEVICE_ID_KEY);
+        const storedId = window.localStorage.getItem(DEVICE_ID_KEY);
+        deviceId = storedId ?? "";
         if (!deviceId) {
             deviceId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
                 ? crypto.randomUUID()
