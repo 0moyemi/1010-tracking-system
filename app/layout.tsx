@@ -62,7 +62,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PushNotificationSetup vapidPublicKey={getVapidPublicKey()} />
+        <PushNotificationSetup />
         <NotificationPermissionPrompt />
         {children}
         <NotificationManager />
