@@ -87,12 +87,16 @@ export default function BroadcastsSection({ isDark = false }: BroadcastsSectionP
                 checkBroadcastAvailability();
             }
         };
-        window.addEventListener('storage', handleStorageChange);
+        if (typeof window !== "undefined") {
+            window.addEventListener('storage', handleStorageChange);
+        }
 
         // Cleanup
         return () => {
             clearInterval(interval);
-            window.removeEventListener('storage', handleStorageChange);
+            if (typeof window !== "undefined") {
+                window.removeEventListener('storage', handleStorageChange);
+            }
         };
     }, [broadcasts]);
 

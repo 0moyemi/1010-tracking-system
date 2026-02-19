@@ -87,11 +87,15 @@ export default function NotificationManager() {
             syncData(deviceId);
         };
 
-        window.addEventListener('storage', handleStorage);
+        if (typeof window !== "undefined") {
+            window.addEventListener('storage', handleStorage);
+        }
         const interval = setInterval(handleStorage, 5 * 60 * 1000);
 
         return () => {
-            window.removeEventListener('storage', handleStorage);
+            if (typeof window !== "undefined") {
+                window.removeEventListener('storage', handleStorage);
+            }
             clearInterval(interval);
         };
     }, []);
