@@ -41,20 +41,28 @@ export default function FollowUpsSection({ isDark = false }: FollowUpsSectionPro
 	const [selectedTemplateById, setSelectedTemplateById] = useState<Record<string, string>>({});
 
 	useEffect(() => {
-		const savedFollowUps = localStorage.getItem("followUps");
+		let savedFollowUps = null;
+		if (typeof window !== "undefined") {
+			savedFollowUps = localStorage.getItem("followUps");
+		}
 		if (savedFollowUps) setFollowUps(JSON.parse(savedFollowUps));
 	}, []);
 
 	useEffect(() => {
-		if (followUps.length > 0) {
-			localStorage.setItem("followUps", JSON.stringify(followUps));
-		} else {
-			localStorage.removeItem("followUps");
+		if (typeof window !== "undefined") {
+			if (followUps.length > 0) {
+				localStorage.setItem("followUps", JSON.stringify(followUps));
+			} else {
+				localStorage.removeItem("followUps");
+			}
 		}
 	}, [followUps]);
 
 	useEffect(() => {
-		const savedTemplates = localStorage.getItem("messageTemplates");
+		let savedTemplates = null;
+		if (typeof window !== "undefined") {
+			savedTemplates = localStorage.getItem("messageTemplates");
+		}
 		if (savedTemplates) setTemplates(JSON.parse(savedTemplates));
 		else setTemplates(defaultTemplates);
 	}, []);
@@ -139,7 +147,9 @@ export default function FollowUpsSection({ isDark = false }: FollowUpsSectionPro
 			return;
 		}
 		const encodedMessage = encodeURIComponent(template.message);
-		window.open(`https://wa.me/${normalized}?text=${encodedMessage}`, "_blank", "noopener,noreferrer");
+		if (typeof window !== "undefined") {
+			window.open(`https://wa.me/${normalized}?text=${encodedMessage}`, "_blank", "noopener,noreferrer");
+		}
 	};
 
 	return (

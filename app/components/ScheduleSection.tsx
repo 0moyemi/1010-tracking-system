@@ -80,12 +80,17 @@ export default function ScheduleSection({ isDark = false }: ScheduleSectionProps
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		const saved = localStorage.getItem("schedule");
+		let saved = null;
+		if (typeof window !== "undefined") {
+			saved = localStorage.getItem("schedule");
+		}
 		if (saved) setSchedule(JSON.parse(saved));
 	}, []);
 
 	useEffect(() => {
-		localStorage.setItem("schedule", JSON.stringify(schedule));
+		if (typeof window !== "undefined") {
+			localStorage.setItem("schedule", JSON.stringify(schedule));
+		}
 	}, [schedule]);
 
 	useEffect(() => {
@@ -155,7 +160,9 @@ export default function ScheduleSection({ isDark = false }: ScheduleSectionProps
 	const handleShare = async (post: ScheduledPost) => {
 		// Copy caption to clipboard first
 		try {
-			await navigator.clipboard.writeText(post.caption);
+			if (typeof window !== "undefined" && navigator.clipboard) {
+				await navigator.clipboard.writeText(post.caption);
+			}
 		} catch (e) {
 			// ignore
 		}
@@ -164,7 +171,7 @@ export default function ScheduleSection({ isDark = false }: ScheduleSectionProps
 		if (media) {
 			const file = new File([media.blob], `media.${media.type === 'image' ? 'jpg' : 'mp4'}`, { type: media.blob.type });
 			// Try Web Share API with file (if supported)
-			if (navigator.canShare && navigator.canShare({ files: [file] })) {
+			if (typeof window !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
 				try {
 					await navigator.share({
 						files: [file],
@@ -177,17 +184,19 @@ export default function ScheduleSection({ isDark = false }: ScheduleSectionProps
 				}
 			}
 			// Fallback: download file and instruct user
-			const url = URL.createObjectURL(media.blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = `media.${media.type === 'image' ? 'jpg' : 'mp4'}`;
-			document.body.appendChild(a);
-			a.click();
-			setTimeout(() => {
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
-				alert('Media downloaded. Please upload it to WhatsApp Status manually. The caption is already copied—just paste it after uploading!');
-			}, 100);
+			if (typeof window !== "undefined") {
+				const url = URL.createObjectURL(media.blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `media.${media.type === 'image' ? 'jpg' : 'mp4'}`;
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(() => {
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+					alert('Media downloaded. Please upload it to WhatsApp Status manually. The caption is already copied—just paste it after uploading!');
+				}, 100);
+			}
 		} else {
 			alert('Media not found.');
 		}

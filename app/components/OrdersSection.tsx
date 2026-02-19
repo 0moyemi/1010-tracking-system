@@ -25,7 +25,10 @@ export default function OrdersSection({ isDark = false }: OrdersSectionProps) {
 
     // Load orders from localStorage on mount
     useEffect(() => {
-        const savedOrders = localStorage.getItem('orders');
+        let savedOrders = null;
+        if (typeof window !== "undefined") {
+            savedOrders = localStorage.getItem('orders');
+        }
         if (savedOrders) {
             setOrders(JSON.parse(savedOrders));
         }
@@ -33,7 +36,7 @@ export default function OrdersSection({ isDark = false }: OrdersSectionProps) {
 
     // Auto-save orders whenever they change
     useEffect(() => {
-        if (orders.length > 0) {
+        if (orders.length > 0 && typeof window !== "undefined") {
             localStorage.setItem('orders', JSON.stringify(orders));
         }
     }, [orders]);

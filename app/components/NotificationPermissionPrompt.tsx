@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 export default function NotificationPermissionPrompt() {
     const [visible, setVisible] = useState(false);
     const [permission, setPermission] = useState(
-        typeof window !== "undefined" ? Notification.permission : "default"
+        typeof window !== "undefined" && typeof Notification !== "undefined" ? Notification.permission : "default"
     );
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
+        if (typeof window === "undefined" || typeof Notification === "undefined") return;
         if (Notification.permission === "default") {
             setVisible(true);
         }
@@ -16,14 +16,16 @@ export default function NotificationPermissionPrompt() {
 
     const handleRequest = () => {
         setVisible(false);
-        Notification.requestPermission().then((perm) => {
-            setPermission(perm);
-            if (perm === "granted") {
-                alert("Notifications enabled! You'll never miss a reminder.");
-            } else {
-                alert("Notifications are disabled. You can enable them in your browser settings.");
-            }
-        });
+        if (typeof window !== "undefined" && typeof Notification !== "undefined") {
+            Notification.requestPermission().then((perm) => {
+                setPermission(perm);
+                if (perm === "granted") {
+                    alert("Notifications enabled! You'll never miss a reminder.");
+                } else {
+                    alert("Notifications are disabled. You can enable them in your browser settings.");
+                }
+            });
+        }
     };
 
     if (!visible || permission !== "default") return null;

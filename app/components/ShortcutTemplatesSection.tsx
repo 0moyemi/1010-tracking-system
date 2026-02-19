@@ -124,19 +124,24 @@ export default function ShortcutTemplatesSection({ isDark = false }: ShortcutTem
 
     // Load templates from localStorage on mount
     useEffect(() => {
-        const savedTemplates = localStorage.getItem('messageTemplates');
+        let savedTemplates = null;
+        if (typeof window !== "undefined") {
+            savedTemplates = localStorage.getItem('messageTemplates');
+        }
         if (savedTemplates) {
             setTemplates(JSON.parse(savedTemplates));
         } else {
             // Initialize with default templates
             setTemplates(defaultTemplates);
-            localStorage.setItem('messageTemplates', JSON.stringify(defaultTemplates));
+            if (typeof window !== "undefined") {
+                localStorage.setItem('messageTemplates', JSON.stringify(defaultTemplates));
+            }
         }
     }, []);
 
     // Save templates to localStorage whenever they change
     useEffect(() => {
-        if (templates.length > 0) {
+        if (templates.length > 0 && typeof window !== "undefined") {
             localStorage.setItem('messageTemplates', JSON.stringify(templates));
         }
     }, [templates]);
@@ -196,14 +201,16 @@ export default function ShortcutTemplatesSection({ isDark = false }: ShortcutTem
     const copyToWhatsApp = async (template: Template) => {
         try {
             // Copy to clipboard
-            await navigator.clipboard.writeText(template.message);
+            if (typeof window !== "undefined" && navigator.clipboard) {
+                await navigator.clipboard.writeText(template.message);
+            }
 
             // Show success feedback
             setCopied(template.id);
             setTimeout(() => setCopied(null), 2000);
 
             // Show a toast/alert for extra clarity
-            if (window && window.navigator && window.navigator.vibrate) {
+            if (typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
                 window.navigator.vibrate(100);
             }
             // Optionally, show a toast (replace with your toast system if available)

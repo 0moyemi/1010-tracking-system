@@ -27,10 +27,15 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
 
     // On mount, set or get first use date
     useEffect(() => {
-        let stored = localStorage.getItem("dailyStatusFirstUse");
+        let stored = null;
+        if (typeof window !== "undefined") {
+            stored = localStorage.getItem("dailyStatusFirstUse");
+        }
         if (!stored) {
             const today = new Date().toISOString().split("T")[0];
-            localStorage.setItem("dailyStatusFirstUse", today);
+            if (typeof window !== "undefined") {
+                localStorage.setItem("dailyStatusFirstUse", today);
+            }
             setFirstUseDate(today);
         } else {
             setFirstUseDate(stored);
@@ -41,20 +46,27 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     // On mount, load or reset month data
     useEffect(() => {
         try {
-            const savedStatus = localStorage.getItem("dailyStatus");
-            const savedMonth = localStorage.getItem("dailyStatusMonth");
+            let savedStatus = null;
+            let savedMonth = null;
+            let savedBroadcasts = null;
+            if (typeof window !== "undefined") {
+                savedStatus = localStorage.getItem("dailyStatus");
+                savedMonth = localStorage.getItem("dailyStatusMonth");
+            }
             const now = new Date();
             const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
             if (savedMonth !== currentMonth) {
                 // Save summary of last month if exists
-                if (savedStatus && savedMonth) {
+                if (savedStatus && savedMonth && typeof window !== "undefined") {
                     localStorage.setItem("dailyStatusSummary_" + savedMonth, savedStatus);
                 }
                 // Reset for new month
                 const days = generateMonthDays();
                 setMonthStatus(days);
-                localStorage.setItem("dailyStatusMonth", currentMonth);
-                localStorage.removeItem("dailyStatus");
+                if (typeof window !== "undefined") {
+                    localStorage.setItem("dailyStatusMonth", currentMonth);
+                    localStorage.removeItem("dailyStatus");
+                }
             } else if (savedStatus) {
                 try {
                     const parsed = JSON.parse(savedStatus);
@@ -70,7 +82,9 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
                 const days = generateMonthDays();
                 setMonthStatus(days);
             }
-            const savedBroadcasts = localStorage.getItem("broadcasts");
+            if (typeof window !== "undefined") {
+                savedBroadcasts = localStorage.getItem("broadcasts");
+            }
             if (savedBroadcasts) {
                 try {
                     const parsed = JSON.parse(savedBroadcasts);
@@ -87,13 +101,13 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     }, []);
 
     useEffect(() => {
-        if (monthStatus.length > 0) {
+        if (monthStatus.length > 0 && typeof window !== "undefined") {
             localStorage.setItem("dailyStatus", JSON.stringify(monthStatus));
         }
     }, [monthStatus]);
 
     useEffect(() => {
-        if (broadcasts.length > 0) {
+        if (broadcasts.length > 0 && typeof window !== "undefined") {
             localStorage.setItem("broadcasts", JSON.stringify(broadcasts));
         }
     }, [broadcasts]);
