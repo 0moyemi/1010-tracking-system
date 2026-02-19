@@ -322,7 +322,7 @@ export default function FollowUpsSection({ isDark = false }: FollowUpsSectionPro
 															<button onClick={() => {
 																const templateId = selectedTemplateById[followUp.id];
 																const template = templates.find(t => t.id === templateId);
-																if (template) navigator.clipboard.writeText(template.message);
+																if (template && typeof window !== "undefined" && window.navigator && window.navigator.clipboard) window.navigator.clipboard.writeText(template.message);
 															}} disabled={!selectedTemplateById[followUp.id]} className={`px-4 py-2 rounded-xl font-semibold transition-all ${selectedTemplateById[followUp.id] ? "bg-blue-700 text-white hover:bg-blue-800" : "bg-gray-700 text-gray-400"}`}>Copy Template</button>
 															<button onClick={() => handleSendNow(followUp)} disabled={!followUp.waNumber || templates.length === 0 || !selectedTemplateById[followUp.id]} className={`px-4 py-2 rounded-xl font-semibold transition-all ${followUp.waNumber && templates.length > 0 && selectedTemplateById[followUp.id] ? "bg-green-700 text-white hover:bg-green-800" : "bg-gray-700 text-gray-400"}`}>Open Chat Now</button>
 														</div>
