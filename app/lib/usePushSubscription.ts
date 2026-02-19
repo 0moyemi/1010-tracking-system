@@ -42,7 +42,7 @@ export function usePushSubscription(vapidPublicKey: string) {
                 }
                 const sub = await reg.pushManager.subscribe({
                     userVisibleOnly: true,
-                    applicationServerKey: appServerKey,
+                    applicationServerKey: appServerKey as BufferSource,
                 });
                 setSubscription(sub);
                 console.log('Push subscription successful:', sub);
@@ -55,7 +55,7 @@ export function usePushSubscription(vapidPublicKey: string) {
     return { subscription, permission };
 }
 
-function urlBase64ToUint8Array(base64String: string) {
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     let rawData = "";
