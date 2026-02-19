@@ -23,6 +23,7 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     const [monthStatus, setMonthStatus] = useState<DayStatus[]>([]);
     const [broadcasts, setBroadcasts] = useState<BroadcastRecord[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [isClientReady, setIsClientReady] = useState(false);
 
     // On mount, set or get first use date
     useEffect(() => {
@@ -34,6 +35,7 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
         } else {
             setFirstUseDate(stored);
         }
+        setIsClientReady(true);
     }, []);
 
     // On mount, load or reset month data
@@ -195,6 +197,14 @@ export default function DailyStatusSection({ isDark = false }: DailyStatusSectio
     }
 
     const progress = calculateProgress();
+
+    if (!isClientReady) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-950">
+                <div className="text-white text-lg">Loading...</div>
+            </div>
+        );
+    }
 
     if (error) {
         return (
