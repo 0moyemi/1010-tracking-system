@@ -39,5 +39,5 @@ export function PushNotificationSetup() {
         }
     }, [permission, subscription, vapidKey]);
 
-    return null;
+    // Removed: legacy push notification setup no longer needed with FCM.
 }

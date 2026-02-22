@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import NotificationManager from "./components/NotificationManager";
-import { PushNotificationSetup } from "./components/PushNotificationSetup";
 import { getVapidPublicKey } from "./lib/getVapidPublicKey";
 import NotificationPermissionPrompt from "./components/NotificationPermissionPrompt";
 
@@ -62,29 +61,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PushNotificationSetup />
         <NotificationPermissionPrompt />
         {children}
         <NotificationManager />
 
-        {/* Service Worker Registration */}
-        <Script id="sw-register" strategy="afterInteractive">
-          {`
-            if (typeof window !== "undefined" && 'serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(
-                  function(registration) {
-                    console.log('Service Worker registered successfully:', registration.scope);
-                  },
-                  function(err) {
-                    console.log('Service Worker registration failed:', err);
-                  }
-                );
-              });
-            }
-          `}
-        </Script>
+        {/* Service Worker Registration removed: now using Firebase messaging SW only */}
       </body>
-    </html>
+    </html >
   );
 }
