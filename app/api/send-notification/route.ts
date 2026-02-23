@@ -1,10 +1,10 @@
+
 import { NextResponse } from 'next/server';
-import { GoogleAuth } from 'google-auth-library';
 import fs from 'fs';
 import path from 'path';
+import { sendPush } from '@/lib/fcm';
 
 const TOKENS_FILE = path.resolve(process.cwd(), 'data', 'push-store.json');
-
 function loadTokens(): Set<string> {
     try {
         const data = fs.readFileSync(TOKENS_FILE, 'utf-8');
@@ -17,53 +17,24 @@ function loadTokens(): Set<string> {
     }
 }
 
-const auth = new GoogleAuth({
-    keyFile: './firebase-service-account.json',
-    scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
-});
-
 export async function POST(request: Request): Promise<Response> {
     try {
         const { title, body, url, targetToken } = await request.json();
-
-        const client = await auth.getClient();
-        const accessToken = await client.getAccessToken();
-        const projectId = await auth.getProjectId();
-
         const tokensSet = loadTokens();
         const targetTokens: string[] = targetToken ? [targetToken] : Array.from(tokensSet);
-
         if (targetTokens.length === 0) {
             return NextResponse.json({ error: 'No FCM tokens found' }, { status: 404 });
         }
-
         const results = await Promise.allSettled(
             targetTokens.map(async (token) => {
-                const res = await fetch(
-                    `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${accessToken.token}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            message: {
-                                token,
-                                notification: {
-                                    title: title || 'New Notification',
-                                    body: body || 'You have a new message',
-                                },
-                                data: { url: url || '/' },
-                            },
-                        }),
-                    }
-                );
-                if (!res.ok) throw new Error(`FCM Error: ${await res.text()}`);
-                return res.json();
+                try {
+                    await sendPush(token, title || 'New Notification', body || 'You have a new message');
+                    return { status: 'fulfilled' };
+                } catch (err) {
+                    return { status: 'rejected', reason: err };
+                }
             })
         );
-
         return NextResponse.json({
             success: true,
             sent: results.filter((r) => r.status === 'fulfilled').length,
