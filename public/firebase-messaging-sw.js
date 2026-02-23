@@ -1,7 +1,20 @@
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+// Force SW to activate and take control immediately
+self.addEventListener('install', (event) => {
+    console.log('[firebase-messaging-sw.js] Installing...');
+    self.skipWaiting();
+});
+self.addEventListener('activate', (event) => {
+    console.log('[firebase-messaging-sw.js] Activated');
+    event.waitUntil(self.clients.claim());
+});
 
-// Firebase configuration (SAME as in lib/firebase.js)
+// Listen for all push events for debugging
+self.addEventListener('push', (event) => {
+    console.log('[firebase-messaging-sw.js] Raw push received:', event.data?.text());
+});
+importScripts('https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging-compat.js');
+
 firebase.initializeApp({
     apiKey: "AIzaSyArADkbbCD1gpteT72vKnrIKlYJIfEcPmk",
     authDomain: "sales-assistant-83e06.firebaseapp.com",
@@ -13,30 +26,23 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handle background messages (app is closed or in background)
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message:', payload);
+    console.log('[firebase-messaging-sw.js] Background message:', payload);
 
-    const notificationTitle = payload.notification?.title || 'New Notification';
-    const notificationOptions = {
+    const title = payload.notification?.title || 'New Notification';
+    const options = {
         body: payload.notification?.body || 'You have a new message',
-        icon: payload.notification?.icon || '/icon-192x192.png',
+        icon: payload.notification?.icon || '/android-chrome-192x192.png',
         badge: '/badge-72x72.png',
-        tag: 'notification-1',
-        requireInteraction: false,
+        tag: 'fcm-notification',
         data: payload.data || {}
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    self.registration.showNotification(title, options);
 });
 
-// Handle notification click
 self.addEventListener('notificationclick', (event) => {
-    console.log('[firebase-messaging-sw.js] Notification clicked:', event);
-
     event.notification.close();
-
-    // Open the app when notification is clicked
     event.waitUntil(
         clients.openWindow(event.notification.data?.url || '/')
     );

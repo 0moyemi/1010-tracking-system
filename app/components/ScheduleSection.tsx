@@ -3,6 +3,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
+import { useFcmNotifications } from '../hooks/useFcmNotifications';
 import { Plus, Calendar, Trash2, Share2, Image as ImageIcon, X } from "lucide-react";
 import { saveMedia, getMedia, deleteMedia } from "../lib/scheduleDb";
 
@@ -59,6 +60,7 @@ type ScheduleSectionProps = {
 };
 
 export default function ScheduleSection({ isDark = false }: ScheduleSectionProps) {
+	const { enableNotifications, permission } = useFcmNotifications();
 	const [schedule, setSchedule] = useState<ScheduleMap>({});
 	const [selectedDay, setSelectedDay] = useState(getTodayISO());
 	const [showAdd, setShowAdd] = useState(false);
@@ -284,6 +286,31 @@ export default function ScheduleSection({ isDark = false }: ScheduleSectionProps
 					>
 						<Plus size={24} strokeWidth={2.5} />
 						Add Scheduled Post
+					</button>
+					{/* Test Notification Button */}
+					<button
+						onClick={async () => {
+							// Ensure notifications are enabled
+							if (permission !== 'granted') {
+								await enableNotifications();
+							}
+							// Trigger client-side notification
+							if (Notification.permission === 'granted') {
+								navigator.serviceWorker.ready.then(reg => {
+									reg.showNotification('Test Notification', {
+										body: 'This is a test from ScheduleSection!',
+										icon: '/android-chrome-192x192.png',
+										badge: '/badge-72x72.png',
+										requireInteraction: true,
+									});
+								});
+							} else {
+								alert('Notification permission not granted.');
+							}
+						}}
+						className="w-full mb-6 py-2 px-6 rounded-xl font-bold text-md flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+					>
+						🔔 Send Test Notification
 					</button>
 					{/* Add Post Modal */}
 					{showAdd && (

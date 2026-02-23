@@ -1,15 +1,10 @@
 'use client'
 
-
 import { useState, useEffect } from 'react';
 import { requestNotificationPermission, onForegroundMessage } from '../lib/firebase';
 
 type NotificationStatus = 'idle' | 'loading' | 'granted' | 'denied' | 'error';
-type NotificationPayload = {
-    title?: string;
-    body?: string;
-    icon?: string;
-};
+type NotificationPayload = { title?: string; body?: string; icon?: string };
 
 export default function FcmNotificationButton() {
     const [token, setToken] = useState<string | null>(null);
@@ -17,14 +12,21 @@ export default function FcmNotificationButton() {
     const [message, setMessage] = useState<NotificationPayload | null>(null);
 
     useEffect(() => {
-        // Listen for foreground messages
-        const unsubscribe = onForegroundMessage((payload: { notification?: NotificationPayload }) => {
+        const unsubscribe = onForegroundMessage((payload) => {
+            console.log('Foreground message:', payload);
             setMessage(payload.notification || null);
-            // Show browser notification manually if in foreground
-            if (payload.notification && Notification.permission === 'granted') {
-                new Notification(payload.notification.title || 'New Message', {
-                    body: payload.notification.body,
-                    icon: payload.notification.icon || '/icon-192x192.png',
+
+            // FCM suppresses UI when tab is active — we show it manually
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then((reg) => {
+                    reg.showNotification(
+                        payload.notification?.title || 'New Message',
+                        {
+                            body: payload.notification?.body || 'You have a notification',
+                            icon: payload.notification?.icon || '/android-chrome-192x192.png',
+                            badge: '/badge-72x72.png',
+                        }
+                    );
                 });
             }
         });
@@ -38,28 +40,16 @@ export default function FcmNotificationButton() {
             if (fcmToken) {
                 setToken(fcmToken);
                 setStatus('granted');
-                // Send token to your server to save it
-                await saveTokenToServer(fcmToken);
+                await fetch('/api/save-fcm-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: fcmToken }),
+                });
             } else {
                 setStatus('denied');
             }
-        } catch (error) {
-            console.error('Error:', error);
+        } catch {
             setStatus('error');
-        }
-    };
-
-    const saveTokenToServer = async (fcmToken: string) => {
-        try {
-            const response = await fetch('/api/save-fcm-token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: fcmToken }),
-            });
-            if (!response.ok) throw new Error('Failed to save token');
-            console.log('Token saved to server');
-        } catch (error) {
-            console.error('Error saving token:', error);
         }
     };
 
@@ -67,12 +57,10 @@ export default function FcmNotificationButton() {
         return (
             <div style={{ padding: 20, border: '1px solid green', borderRadius: 8 }}>
                 <h3>✅ Notifications Enabled</h3>
-                <p style={{ fontSize: 12, wordBreak: 'break-all' }}>
-                    Token: {token?.substring(0, 50)}...
-                </p>
+                <p style={{ fontSize: 12, wordBreak: 'break-all' }}>Token: {token?.substring(0, 50)}...</p>
                 {message && (
                     <div style={{ marginTop: 10, padding: 10, background: '#f0f0f0' }}>
-                        <strong>Last message:</strong> {message.title} - {message.body}
+                        <strong>Last message:</strong> {message.title} — {message.body}
                     </div>
                 )}
             </div>
@@ -82,28 +70,12 @@ export default function FcmNotificationButton() {
     return (
         <div style={{ padding: 20, border: '1px solid #ccc', borderRadius: 8 }}>
             <h3>Push Notifications</h3>
-            {status === 'denied' && (
-                <p style={{ color: 'red' }}>
-                    Permission denied. Please enable notifications in browser settings.
-                </p>
-            )}
-            {status === 'error' && (
-                <p style={{ color: 'red' }}>
-                    An error occurred. Please try again.
-                </p>
-            )}
+            {status === 'denied' && <p style={{ color: 'red' }}>Permission denied. Enable in browser settings.</p>}
+            {status === 'error' && <p style={{ color: 'red' }}>Error occurred. Try again.</p>}
             <button
                 onClick={enableNotifications}
                 disabled={status === 'loading'}
-                style={{
-                    padding: '10px 20px',
-                    fontSize: 16,
-                    cursor: 'pointer',
-                    background: '#0070f3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 5,
-                }}
+                style={{ padding: '10px 20px', fontSize: 16, cursor: 'pointer', background: '#0070f3', color: 'white', border: 'none', borderRadius: 5 }}
             >
                 {status === 'loading' ? 'Enabling...' : 'Enable Push Notifications'}
             </button>

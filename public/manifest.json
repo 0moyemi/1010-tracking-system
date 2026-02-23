@@ -25,12 +25,8 @@
             "purpose": "badge"
         }
     ],
-    "categories": [
-        "business",
-        "productivity",
-        "finance"
-    ],
+    "categories": ["business", "productivity", "finance"],
     "lang": "en-NG",
     "dir": "ltr",
-    "gcm_sender_id": "103953800507"
+    "gcm_sender_id": "257652607056"
 }

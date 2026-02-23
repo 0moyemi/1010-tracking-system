@@ -1,41 +1,30 @@
 
 'use client';
-import FcmNotificationButton from './components/FcmNotificationButton'
+
+import Navigation from './components/Navigation';
+import NotificationPermissionPrompt from './components/NotificationPermissionPrompt';
+import BroadcastsSection from './components/BroadcastsSection';
+import DailyStatusSection from './components/DailyStatusSection';
+import FollowUpsSection from './components/FollowUpsSection';
+import OrdersSection from './components/OrdersSection';
+import ScheduleSection from './components/ScheduleSection';
+import ShortcutTemplatesSection from './components/ShortcutTemplatesSection';
+
 
 export default function Home() {
   return (
-    <main style={{ padding: 40 }}>
-      <h1>My App with Push Notifications</h1>
-      {/* Add the notification button */}
-      <FcmNotificationButton />
-      {/* Manual test button */}
-      <TestNotificationButton />
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <NotificationPermissionPrompt />
+      <Navigation isDark={false} toggleTheme={() => { }} />
+      <div className="max-w-4xl mx-auto p-4 grid gap-8">
+        <DailyStatusSection />
+        <BroadcastsSection />
+        <FollowUpsSection />
+        <OrdersSection />
+        <ScheduleSection />
+        <ShortcutTemplatesSection />
+      </div>
     </main>
-  )
+  );
 }
 
-// Simple test button component
-function TestNotificationButton() {
-  const sendTest = async () => {
-    const res = await fetch('/api/send-notification', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: 'Test Notification',
-        body: 'This is a test from Firebase!',
-        url: '/'
-      })
-    })
-    const data = await res.json()
-    alert(JSON.stringify(data, null, 2))
-  }
-
-  return (
-    <button
-      onClick={sendTest}
-      style={{ marginTop: 20, padding: '10px 20px' }}
-    >
-      Send Test Notification
-    </button>
-  )
-}
